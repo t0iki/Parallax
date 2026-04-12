@@ -47,6 +47,13 @@ function detectSessionStatus(
 	}
 }
 
+// バックグラウンドで10秒ごとに全セッションの状態を更新
+setInterval(() => {
+	for (const sessionName of tmuxListTicketSessions()) {
+		detectSessionStatus(sessionName);
+	}
+}, 10_000);
+
 export async function handleSessions(
 	req: http.IncomingMessage,
 	res: http.ServerResponse,
