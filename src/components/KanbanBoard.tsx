@@ -17,6 +17,7 @@ type Props = {
 	onDelete: (id: string) => void;
 	onStart: (ticketId: string) => void;
 	onDecompose: (ticketId: string) => void;
+	onResetToTodo: (ticketId: string) => void;
 	onTicketClick: (ticketId: string) => void;
 	selectedTicketId: string | null;
 };
@@ -40,14 +41,18 @@ const menuItemStyle: React.CSSProperties = {
 function TicketMenu({
 	menuOpen,
 	ticketId,
+	isInProgress,
 	onToggleMenu,
 	onDecompose,
+	onResetToTodo,
 	onDelete,
 }: {
 	menuOpen: boolean;
 	ticketId: string;
+	isInProgress: boolean;
 	onToggleMenu: (id: string) => void;
 	onDecompose: (id: string) => void;
+	onResetToTodo: (id: string) => void;
 	onDelete: (id: string) => void;
 }) {
 	const btnRef = useRef<HTMLButtonElement>(null);
@@ -119,6 +124,25 @@ function TicketMenu({
 					>
 						タスク分解
 					</button>
+					{isInProgress && (
+						<button
+							type="button"
+							onClick={(e) => {
+								e.stopPropagation();
+								onToggleMenu("");
+								onResetToTodo(ticketId);
+							}}
+							style={{ ...menuItemStyle, color: "#c68a1a" }}
+							onMouseEnter={(e) => {
+								(e.target as HTMLElement).style.backgroundColor = "#2a2a40";
+							}}
+							onMouseLeave={(e) => {
+								(e.target as HTMLElement).style.backgroundColor = "transparent";
+							}}
+						>
+							TODOに戻す
+						</button>
+					)}
 					<button
 						type="button"
 						onClick={(e) => {
@@ -152,6 +176,7 @@ function TicketCard({
 	onDelete,
 	onStart,
 	onDecompose,
+	onResetToTodo,
 	onToggleMenu,
 	onClick,
 }: {
@@ -164,6 +189,7 @@ function TicketCard({
 	onDelete: (id: string) => void;
 	onStart: (ticketId: string) => void;
 	onDecompose: (ticketId: string) => void;
+	onResetToTodo: (ticketId: string) => void;
 	onToggleMenu: (ticketId: string) => void;
 	onClick: () => void;
 }) {
@@ -250,8 +276,10 @@ function TicketCard({
 					<TicketMenu
 						menuOpen={menuOpen}
 						ticketId={ticket.id}
+						isInProgress={ticket.status === "in_progress"}
 						onToggleMenu={onToggleMenu}
 						onDecompose={onDecompose}
+						onResetToTodo={onResetToTodo}
 						onDelete={onDelete}
 					/>
 				</div>
@@ -432,6 +460,7 @@ export function KanbanBoard({
 	onDelete,
 	onStart,
 	onDecompose,
+	onResetToTodo,
 	onTicketClick,
 	selectedTicketId,
 }: Props) {
@@ -553,6 +582,7 @@ export function KanbanBoard({
 											onDelete={onDelete}
 											onStart={onStart}
 											onDecompose={onDecompose}
+											onResetToTodo={onResetToTodo}
 											onToggleMenu={(id) =>
 												setOpenMenuId(openMenuId === id ? null : id)
 											}

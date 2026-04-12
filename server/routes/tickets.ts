@@ -199,6 +199,48 @@ export async function handleTickets(
 		return true;
 	}
 
+	// POST /api/tickets/:id/reset — TODOに戻す（worktree/ブランチ/tmux削除）
+	const resetMatch = url.pathname.match(/^\/api\/tickets\/([^/]+)\/reset$/);
+	if (req.method === "POST" && resetMatch) {
+		const id = resetMatch[1];
+		const ticketInfo = db
+			.prepare(
+				"SELECT worktree_path, work_directory_id, branch_name FROM tickets WHERE id = ?",
+			)
+			.get(id) as
+			| {
+					worktree_path: string | null;
+					work_directory_id: string | null;
+					branch_name: string | null;
+			  }
+			| undefined;
+		if (!ticketInfo) {
+			json(res, 404, { error: "Ticket not found" });
+			return true;
+		}
+
+		tmuxKillSession(`plx-ticket-${id}`);
+
+		if (ticketInfo.worktree_path && ticketInfo.work_directory_id) {
+			const dir = db
+				.prepare("SELECT path FROM directories WHERE id = ?")
+				.get(ticketInfo.work_directory_id) as { path: string } | undefined;
+			if (dir) {
+				removeWorktree(dir.path, ticketInfo.worktree_path);
+				if (ticketInfo.branch_name) {
+					deleteBranch(dir.path, ticketInfo.branch_name);
+				}
+			}
+		}
+
+		db.prepare(
+			"UPDATE tickets SET status = ?, start_phase = NULL, base_commit = NULL, work_directory_id = NULL, worktree_path = NULL, branch_name = NULL WHERE id = ?",
+		).run("todo", id);
+
+		json(res, 200, { id });
+		return true;
+	}
+
 	// POST /api/tickets/:id/send-keys
 	const sendKeysMatch = url.pathname.match(
 		/^\/api\/tickets\/([^/]+)\/send-keys$/,

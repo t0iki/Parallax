@@ -140,6 +140,26 @@ export function TodoApp() {
 		});
 	};
 
+	const resetToTodo = async (id: string) => {
+		setTickets((prev) =>
+			prev.map((t) =>
+				t.id === id
+					? {
+							...t,
+							status: "todo" as const,
+							startPhase: null,
+							baseCommit: null,
+							workDirectoryId: null,
+							worktreePath: null,
+						}
+					: t,
+			),
+		);
+		setActiveSessions((prev) => prev.filter((s) => s.ticketId !== id));
+		if (selectedTicketId === id) setSelectedTicketId(null);
+		await fetch(`/api/tickets/${id}/reset`, { method: "POST" });
+	};
+
 	const deleteTicket = async (id: string) => {
 		setTickets((prev) => prev.filter((t) => t.id !== id));
 		setActiveSessions((prev) => prev.filter((s) => s.ticketId !== id));
@@ -308,6 +328,7 @@ export function TodoApp() {
 				onDelete={deleteTicket}
 				onStart={handleStart}
 				onDecompose={decomposeTicket}
+				onResetToTodo={resetToTodo}
 				onTicketClick={handleTicketClick}
 				selectedTicketId={selectedTicketId}
 			/>
