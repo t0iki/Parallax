@@ -17,7 +17,7 @@ function detectSessionStatus(
 ): "idle" | "working" | "error" {
 	try {
 		const output = execSync(
-			`tmux capture-pane -t "${sessionName}" -p -S -5 2>/dev/null`,
+			`tmux capture-pane -t "${sessionName}" -p -S -20 2>/dev/null`,
 		)
 			.toString()
 			.trim();
