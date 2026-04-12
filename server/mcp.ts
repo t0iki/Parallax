@@ -3,7 +3,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { createPullRequest, fetchGitHubIssue } from "./github.js";
 
-const API_BASE = "http://localhost:3001/api";
+const API_BASE = "http://localhost:24510/api";
 
 const server = new McpServer({
 	name: "plx-todo",

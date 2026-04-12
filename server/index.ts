@@ -7,7 +7,7 @@ import { handleSessions } from "./routes/sessions.js";
 import { handleTickets } from "./routes/tickets.js";
 import { tmuxSessionExists } from "./services/tmux.js";
 
-const PORT = 3001;
+const PORT = 24510;
 const SESSION_NAME = "plx-main";
 const PROJECT_DIR = import.meta.dirname
 	? path.join(import.meta.dirname, "..")

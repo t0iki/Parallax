@@ -22,7 +22,7 @@ Installs missing prerequisites via Homebrew, runs `pnpm install`, and links the 
 plx
 ```
 
-Opens at http://localhost:5173. Starts both the API server (port 3001) and Vite dev server. Press Ctrl+C to stop.
+Opens at http://localhost:24511. Starts both the API server (port 24510) and Vite dev server. Press Ctrl+C to stop.
 
 Alternatively, from the project directory:
 
