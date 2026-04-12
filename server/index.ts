@@ -33,7 +33,7 @@ const server = http.createServer(async (req, res) => {
 
 	if (await handleTickets(req, res, url)) return;
 	if (await handleDirectories(req, res, url)) return;
-	if (handleSessions(req, res, url, PROJECT_DIR)) return;
+	if (await handleSessions(req, res, url, PROJECT_DIR)) return;
 
 	res.writeHead(404);
 	res.end("Not Found");

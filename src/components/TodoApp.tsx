@@ -115,6 +115,19 @@ export function TodoApp() {
 		});
 	};
 
+	const decomposeTicket = async (ticketId: string) => {
+		const ticket = tickets.find((t) => t.id === ticketId);
+		if (!ticket) return;
+		const desc = ticket.description ? `\n\n説明:\n${ticket.description}` : "";
+		await fetch("/api/sessions/main/send-keys", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				text: `以下のチケットをサブタスクに分解して、plx-todo MCPのcreate_ticketで親チケットID "${ticketId}" を指定してサブタスクを作成してください。必要に応じてadd_dependencyで依存関係も設定してください。\n\nチケット: ${ticket.title}${desc}`,
+			}),
+		});
+	};
+
 	const createPR = async (ticketId: string) => {
 		const session = activeSessions.find((s) => s.ticketId === ticketId);
 		if (!session) return;
@@ -238,6 +251,7 @@ export function TodoApp() {
 					onClose={() => setSelectedTicketId(null)}
 					onUpdate={updateTicket}
 					onCreatePR={createPR}
+					onDecompose={decomposeTicket}
 				/>
 			)}
 

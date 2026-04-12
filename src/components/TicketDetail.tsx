@@ -14,17 +14,20 @@ type Props = {
 		fields: { title?: string; description?: string },
 	) => void;
 	onCreatePR: (ticketId: string) => void;
+	onDecompose: (ticketId: string) => void;
 };
 
 function Overview({
 	ticket,
 	onUpdate,
+	onDecompose,
 }: {
 	ticket: Ticket;
 	onUpdate: (
 		id: string,
 		fields: { title?: string; description?: string },
 	) => void;
+	onDecompose: (ticketId: string) => void;
 }) {
 	const [title, setTitle] = useState(ticket.title);
 	const [description, setDescription] = useState(ticket.description);
@@ -107,6 +110,22 @@ function Overview({
 					</a>
 				</div>
 			)}
+			<button
+				type="button"
+				onClick={() => onDecompose(ticket.id)}
+				style={{
+					padding: "8px 16px",
+					fontSize: 13,
+					backgroundColor: "transparent",
+					color: "#58a6ff",
+					border: "1px solid #58a6ff",
+					borderRadius: 4,
+					cursor: "pointer",
+					alignSelf: "flex-start",
+				}}
+			>
+				タスク分解
+			</button>
 		</div>
 	);
 }
@@ -117,6 +136,7 @@ export function TicketDetail({
 	onClose,
 	onUpdate,
 	onCreatePR,
+	onDecompose,
 }: Props) {
 	const [tab, setTab] = useState<DetailTab>("overview");
 	const [widthPercent, setWidthPercent] = useState(60);
@@ -315,7 +335,11 @@ export function TicketDetail({
 				</div>
 				<div style={{ flex: 1, overflow: "hidden" }}>
 					{tab === "overview" ? (
-						<Overview ticket={ticket} onUpdate={onUpdate} />
+						<Overview
+							ticket={ticket}
+							onUpdate={onUpdate}
+							onDecompose={onDecompose}
+						/>
 					) : tab === "terminal" && session ? (
 						<Terminal
 							sessionName={session.sessionName}
