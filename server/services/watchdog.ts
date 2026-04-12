@@ -19,11 +19,9 @@ function capturePaneOutput(sessionName: string, lines = 20): string {
 }
 
 function extractSessionId(output: string): string | null {
-	// Claude Code は /quit 時や起動時に session id を表示する
-	// 例: "Session ID: abc123..." や "session: abc123"
-	const match = output.match(
-		/(?:Session ID|session|Resumed session|Session started)[\s:]+([a-f0-9-]{36}|[a-f0-9]{8,})/i,
-	);
+	// Claude Code は /quit 時に以下の形式で出力:
+	// "claude --resume 08435ac3-7caa-4dc9-b5a1-3ee9bd938896"
+	const match = output.match(/claude\s+--resume\s+([a-f0-9-]{36})/);
 	return match?.[1] ?? null;
 }
 
