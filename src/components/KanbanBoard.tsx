@@ -1,12 +1,12 @@
 import { useState } from "react";
-import type { Directory } from "./directory";
+import type { Directory } from "../types/directory";
 import {
 	STATUS_LABELS,
 	STATUSES,
 	type Status,
 	type Ticket,
 	type TicketDependency,
-} from "./ticket";
+} from "../types/ticket";
 
 type Props = {
 	tickets: Ticket[];

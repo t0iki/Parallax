@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Directory } from "./directory";
+import type { Directory } from "../types/directory";
 
 const INPUT_STYLE: React.CSSProperties = {
 	padding: "6px 8px",

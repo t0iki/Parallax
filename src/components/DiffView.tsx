@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { type DiffHunk, parseDiff } from "./diffParser";
+import { type DiffHunk, parseDiff } from "../lib/diffParser";
 
 type DiffFile = { status: string; path: string };
 
@@ -219,21 +219,13 @@ export function DiffView({ ticketId }: { ticketId: string }) {
 		}
 		setLoading(true);
 		const url = `/api/tickets/${ticketId}/diff/${selectedFile.split("/").map(encodeURIComponent).join("/")}`;
-		console.log("[DiffView] fetching file diff:", url);
 		fetch(url)
-			.then((res) => {
-				console.log("[DiffView] response status:", res.status);
-				return res.text();
-			})
+			.then((res) => res.text())
 			.then((text) => {
-				console.log("[DiffView] diff text length:", text.length);
 				setHunks(parseDiff(text));
 				setLoading(false);
 			})
-			.catch((err) => {
-				console.error("[DiffView] fetch error:", err);
-				setLoading(false);
-			});
+			.catch(() => setLoading(false));
 	}, [ticketId, selectedFile]);
 
 	if (error) {

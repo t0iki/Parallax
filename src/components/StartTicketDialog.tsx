@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { Directory } from "./directory";
-import type { Ticket } from "./ticket";
+import type { Directory } from "../types/directory";
+import type { Ticket } from "../types/ticket";
 
 type Props = {
 	ticket: Ticket;

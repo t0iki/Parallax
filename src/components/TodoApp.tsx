@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import type { Directory } from "./directory";
+import type { Directory } from "../types/directory";
+import type { Status, Ticket, TicketDependency } from "../types/ticket";
 import { KanbanBoard } from "./KanbanBoard";
 import { StartTicketDialog } from "./StartTicketDialog";
 import { TicketDetail } from "./TicketDetail";
-import type { Status, Ticket, TicketDependency } from "./ticket";
 
 type ActiveSession = {
 	ticketId: string;

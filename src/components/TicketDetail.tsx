@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { Ticket } from "../types/ticket";
 import { DiffView } from "./DiffView";
 import { Terminal } from "./Terminal";
-import type { Ticket } from "./ticket";
 
 type DetailTab = "overview" | "terminal" | "diff";
 

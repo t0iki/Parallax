@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
-import { Settings } from "./Settings";
-import { Terminal } from "./Terminal";
-import { TodoApp } from "./TodoApp";
+import { Settings } from "./components/Settings";
+import { Terminal } from "./components/Terminal";
+import { TodoApp } from "./components/TodoApp";
 
 type Page = "todo" | "settings";
 
