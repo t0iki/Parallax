@@ -21,8 +21,9 @@ function capturePaneOutput(sessionName: string, lines = 20): string {
 function extractSessionId(output: string): string | null {
 	// Claude Code は /quit 時に以下の形式で出力:
 	// "claude --resume 08435ac3-7caa-4dc9-b5a1-3ee9bd938896"
-	const match = output.match(/claude\s+--resume\s+([a-f0-9-]{36})/);
-	return match?.[1] ?? null;
+	// 複数マッチする場合は最後（最新）のものを使う
+	const matches = [...output.matchAll(/claude\s+--resume\s+([a-f0-9-]{36})/g)];
+	return matches.length > 0 ? matches[matches.length - 1][1] : null;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -52,8 +53,11 @@ async function restartClaude(sessionName: string): Promise<void> {
 		await sleep(5000);
 
 		// Step 3: セッションIDを抽出
-		const output = capturePaneOutput(sessionName, 30);
+		const output = capturePaneOutput(sessionName, 50);
 		const sessionId = extractSessionId(output);
+		console.log(
+			`[watchdog] Session ID: ${sessionId ?? "not found"} (captured ${output.split("\n").length} lines)`,
+		);
 
 		// Step 4: 再起動メッセージ
 		const msg = sessionId
