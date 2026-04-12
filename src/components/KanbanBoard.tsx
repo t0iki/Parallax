@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Directory } from "../types/directory";
 import {
 	STATUS_LABELS,
@@ -28,6 +28,119 @@ const COLUMN_COLORS: Record<
 	todo: { bg: "#1c1c28", border: "#2a2a35", badge: "#6c757d" },
 	in_progress: { bg: "#1f1c14", border: "#3d3520", badge: "#c68a1a" },
 };
+
+const menuItemStyle: React.CSSProperties = {
+	all: "unset",
+	padding: "6px 10px",
+	fontSize: 12,
+	cursor: "pointer",
+	borderRadius: 4,
+};
+
+function TicketMenu({
+	menuOpen,
+	ticketId,
+	onToggleMenu,
+	onDecompose,
+	onDelete,
+}: {
+	menuOpen: boolean;
+	ticketId: string;
+	onToggleMenu: (id: string) => void;
+	onDecompose: (id: string) => void;
+	onDelete: (id: string) => void;
+}) {
+	const btnRef = useRef<HTMLButtonElement>(null);
+	const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+
+	useEffect(() => {
+		if (menuOpen && btnRef.current) {
+			const rect = btnRef.current.getBoundingClientRect();
+			const menuHeight = 70;
+			const spaceBelow = window.innerHeight - rect.bottom;
+			setPos({
+				top: spaceBelow < menuHeight ? rect.top - menuHeight : rect.bottom + 4,
+				left: rect.right - 120,
+			});
+		}
+	}, [menuOpen]);
+
+	return (
+		<>
+			<button
+				ref={btnRef}
+				type="button"
+				onClick={(e) => {
+					e.stopPropagation();
+					onToggleMenu(ticketId);
+				}}
+				style={{
+					all: "unset",
+					cursor: "pointer",
+					padding: "2px 4px",
+					fontSize: 14,
+					color: "#666",
+					lineHeight: 1,
+				}}
+			>
+				⋯
+			</button>
+			{menuOpen && pos && (
+				<div
+					style={{
+						position: "fixed",
+						top: pos.top,
+						left: pos.left,
+						backgroundColor: "#1e1e2e",
+						border: "1px solid #2a2a35",
+						borderRadius: 6,
+						padding: 4,
+						zIndex: 100,
+						minWidth: 120,
+						display: "flex",
+						flexDirection: "column",
+						boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+					}}
+				>
+					<button
+						type="button"
+						onClick={(e) => {
+							e.stopPropagation();
+							onToggleMenu("");
+							onDecompose(ticketId);
+						}}
+						style={{ ...menuItemStyle, color: "#58a6ff" }}
+						onMouseEnter={(e) => {
+							(e.target as HTMLElement).style.backgroundColor = "#2a2a40";
+						}}
+						onMouseLeave={(e) => {
+							(e.target as HTMLElement).style.backgroundColor = "transparent";
+						}}
+					>
+						タスク分解
+					</button>
+					<button
+						type="button"
+						onClick={(e) => {
+							e.stopPropagation();
+							onToggleMenu("");
+							onDelete(ticketId);
+						}}
+						style={{ ...menuItemStyle, color: "#f85149" }}
+						onMouseEnter={(e) => {
+							(e.target as HTMLElement).style.backgroundColor = "#2a2a40";
+						}}
+						onMouseLeave={(e) => {
+							(e.target as HTMLElement).style.backgroundColor = "transparent";
+						}}
+					>
+						削除
+					</button>
+				</div>
+			)}
+		</>
+	);
+}
 
 function TicketCard({
 	ticket,
@@ -134,94 +247,13 @@ function TicketCard({
 					{childCount > 0 && (
 						<span style={{ fontSize: 11, color: "#888" }}>{childCount}件</span>
 					)}
-					<div style={{ position: "relative" }}>
-						<button
-							type="button"
-							onClick={(e) => {
-								e.stopPropagation();
-								onToggleMenu(ticket.id);
-							}}
-							style={{
-								all: "unset",
-								cursor: "pointer",
-								padding: "2px 4px",
-								fontSize: 14,
-								color: "#666",
-								lineHeight: 1,
-							}}
-						>
-							⋯
-						</button>
-						{menuOpen && (
-							<div
-								style={{
-									position: "absolute",
-									right: 0,
-									top: "100%",
-									marginTop: 4,
-									backgroundColor: "#1e1e2e",
-									border: "1px solid #2a2a35",
-									borderRadius: 6,
-									padding: 4,
-									zIndex: 20,
-									minWidth: 120,
-									display: "flex",
-									flexDirection: "column",
-								}}
-							>
-								<button
-									type="button"
-									onClick={(e) => {
-										e.stopPropagation();
-										onToggleMenu("");
-										onDecompose(ticket.id);
-									}}
-									style={{
-										all: "unset",
-										padding: "6px 10px",
-										fontSize: 12,
-										color: "#58a6ff",
-										cursor: "pointer",
-										borderRadius: 4,
-									}}
-									onMouseEnter={(e) => {
-										(e.target as HTMLElement).style.backgroundColor = "#2a2a40";
-									}}
-									onMouseLeave={(e) => {
-										(e.target as HTMLElement).style.backgroundColor =
-											"transparent";
-									}}
-								>
-									タスク分解
-								</button>
-								<button
-									type="button"
-									onClick={(e) => {
-										e.stopPropagation();
-										onToggleMenu("");
-										onDelete(ticket.id);
-									}}
-									style={{
-										all: "unset",
-										padding: "6px 10px",
-										fontSize: 12,
-										color: "#f85149",
-										cursor: "pointer",
-										borderRadius: 4,
-									}}
-									onMouseEnter={(e) => {
-										(e.target as HTMLElement).style.backgroundColor = "#2a2a40";
-									}}
-									onMouseLeave={(e) => {
-										(e.target as HTMLElement).style.backgroundColor =
-											"transparent";
-									}}
-								>
-									削除
-								</button>
-							</div>
-						)}
-					</div>
+					<TicketMenu
+						menuOpen={menuOpen}
+						ticketId={ticket.id}
+						onToggleMenu={onToggleMenu}
+						onDecompose={onDecompose}
+						onDelete={onDelete}
+					/>
 				</div>
 			</div>
 			{ticket.startPhase && ticket.startPhase !== "running" && (
