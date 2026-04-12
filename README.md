@@ -38,3 +38,15 @@ pnpm start
 4. **Monitor** — Click a ticket to view its terminal, diff, or edit its description. Work continues even when the browser is closed
 5. **Create PR** — Click "PR作成" in the ticket detail panel
 6. **Delete** — Removes the ticket, worktree, branch, and tmux session
+
+### Troubleshooting
+
+**"Unable to connect to API (ConnectionRefused)"**
+
+This happens when a tmux session loses access to Claude Code's auth credentials (e.g. after `plx` restart or network change). Fix:
+
+```bash
+tmux kill-server
+```
+
+Then restart `plx`. All sessions will be recreated with fresh credentials via `launch-claude.sh`.
