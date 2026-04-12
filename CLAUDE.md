@@ -1,10 +1,10 @@
-# Zanki
+# Parallax
 
 ブラウザ上でターミナル（Claude Code）とカンバンボードを並べて使えるアプリケーション。
 
 ## チケット管理
 
-「チケットを作成して」「Todoに追加して」などの指示があった場合、**必ず** MCPツール `zanki-todo` の `create_ticket` を使ってアプリ内のカンバンボードに追加すること。確認や質問は不要で、即座に作成する。GitHub IssueやLinearなど外部サービスへの作成は、ユーザーが明示的に指定した場合のみ行う。
+「チケットを作成して」「Todoに追加して」などの指示があった場合、**必ず** MCPツール `plx-todo` の `create_ticket` を使ってアプリ内のカンバンボードに追加すること。確認や質問は不要で、即座に作成する。GitHub IssueやLinearなど外部サービスへの作成は、ユーザーが明示的に指定した場合のみ行う。
 
 ### GitHub Issue からのチケット作成
 
@@ -18,7 +18,7 @@ GitHub IssueのURLが与えられた場合:
 
 GitHub の情報取得やPR作成には `gh` CLI ではなく、**必ず MCPツールを使うこと**。Socket Firewall のプロキシ環境下では `gh` CLI の TLS 検証が失敗するが、MCPツールは `NODE_EXTRA_CA_CERTS` で対応済み。
 
-### 利用可能なMCPツール (zanki-todo)
+### 利用可能なMCPツール (plx-todo)
 
 - `create_ticket` — チケットを作成 (title, description, status, parentId, sourceUrl)
 - `list_tickets` — チケット一覧を取得

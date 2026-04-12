@@ -162,7 +162,7 @@ export async function handleTickets(
 			  }
 			| undefined;
 
-		tmuxKillSession(`zanki-ticket-${id}`);
+		tmuxKillSession(`plx-ticket-${id}`);
 
 		if (ticketInfo?.worktree_path && ticketInfo.work_directory_id) {
 			const dir = db
@@ -206,7 +206,7 @@ export async function handleTickets(
 	if (req.method === "POST" && sendKeysMatch) {
 		const ticketId = sendKeysMatch[1];
 		const body = JSON.parse(await readBody(req));
-		const sessionName = `zanki-ticket-${ticketId}`;
+		const sessionName = `plx-ticket-${ticketId}`;
 		if (!tmuxSessionExists(sessionName)) {
 			json(res, 400, { error: "Session not found" });
 			return true;

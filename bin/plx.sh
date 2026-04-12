@@ -17,5 +17,5 @@ SERVER_PID=$!
 npx vite &
 VITE_PID=$!
 
-echo "Zanki running at http://localhost:5173"
+echo "Parallax running at http://localhost:5173"
 wait

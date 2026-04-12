@@ -14,7 +14,7 @@ export function handleSessions(
 
 	const sessionNames = tmuxListTicketSessions();
 	const sessions = sessionNames.map((sessionName) => {
-		const ticketId = sessionName.replace("zanki-ticket-", "");
+		const ticketId = sessionName.replace("plx-ticket-", "");
 		const ticket = db
 			.prepare("SELECT id, title FROM tickets WHERE id = ?")
 			.get(ticketId) as { id: string; title: string } | undefined;

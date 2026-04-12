@@ -17,7 +17,7 @@ export function createWorktree(params: {
 	baseBranch: string;
 }): void {
 	if (fs.existsSync(params.worktreeDir)) return;
-	fs.mkdirSync(path.join(params.repoPath, ".zanki-worktrees"), {
+	fs.mkdirSync(path.join(params.repoPath, ".plx-worktrees"), {
 		recursive: true,
 	});
 	execSync(

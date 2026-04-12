@@ -8,7 +8,7 @@ import { handleTickets } from "./routes/tickets.js";
 import { tmuxSessionExists } from "./services/tmux.js";
 
 const PORT = 3001;
-const SESSION_NAME = "zanki-main";
+const SESSION_NAME = "plx-main";
 const PROJECT_DIR = import.meta.dirname
 	? path.join(import.meta.dirname, "..")
 	: process.cwd();
@@ -92,7 +92,7 @@ wss.on("connection", (ws, req: http.IncomingMessage) => {
 		});
 
 		// Main session only: auto-launch Claude Code
-		if (isNew && !sessionName.startsWith("zanki-ticket-")) {
+		if (isNew && !sessionName.startsWith("plx-ticket-")) {
 			setTimeout(
 				() => safeWrite("claude --dangerously-skip-permissions\n"),
 				500,

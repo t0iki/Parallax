@@ -23,7 +23,7 @@ export function parseGitHubIssueUrl(
 function githubHeaders(): Record<string, string> {
 	const headers: Record<string, string> = {
 		Accept: "application/vnd.github.v3+json",
-		"User-Agent": "zanki-todo",
+		"User-Agent": "plx-todo",
 	};
 	if (process.env.GITHUB_TOKEN) {
 		headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;

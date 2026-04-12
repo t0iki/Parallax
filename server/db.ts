@@ -1,7 +1,7 @@
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
-const DB_PATH = path.join(import.meta.dirname, "..", "data", "zanki.db");
+const DB_PATH = path.join(import.meta.dirname, "..", "data", "parallax.db");
 
 const db = new DatabaseSync(DB_PATH);
 

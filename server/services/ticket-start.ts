@@ -6,7 +6,7 @@ import db from "../db.js";
 import { createWorktree, getHeadCommit, slugify } from "./git.js";
 import { tmuxSendKeys, tmuxSessionExists } from "./tmux.js";
 
-const ZANKI_DIR = import.meta.dirname
+const PLX_DIR = import.meta.dirname
 	? path.join(import.meta.dirname, "..")
 	: process.cwd();
 
@@ -40,7 +40,7 @@ function buildDescriptionFile(
 	ticketId: string,
 	ticket: { title: string; description: string },
 ): string {
-	const descFile = path.join(os.tmpdir(), `zanki-ticket-${ticketId}.md`);
+	const descFile = path.join(os.tmpdir(), `plx-ticket-${ticketId}.md`);
 
 	const subtasks = db
 		.prepare(
@@ -87,7 +87,7 @@ function buildDescriptionFile(
 		}
 	}
 
-	const claudeMdPath = path.join(ZANKI_DIR, "CLAUDE.md");
+	const claudeMdPath = path.join(PLX_DIR, "CLAUDE.md");
 	let rules = "";
 	if (fs.existsSync(claudeMdPath)) {
 		rules = `\n\n---\n# ルール\n${fs.readFileSync(claudeMdPath, "utf-8")}`;
@@ -101,13 +101,13 @@ function buildDescriptionFile(
 }
 
 function buildMcpConfig(ticketId: string): string {
-	const mcpConfigPath = path.join(os.tmpdir(), `zanki-mcp-${ticketId}.json`);
+	const mcpConfigPath = path.join(os.tmpdir(), `plx-mcp-${ticketId}.json`);
 	fs.writeFileSync(
 		mcpConfigPath,
 		JSON.stringify({
 			mcpServers: {
-				"zanki-todo": {
-					command: path.join(ZANKI_DIR, "server", "run-mcp.sh"),
+				"plx-todo": {
+					command: path.join(PLX_DIR, "server", "run-mcp.sh"),
 					args: [],
 				},
 			},
@@ -143,7 +143,7 @@ export function startTicket(params: StartParams): StartResult | null {
 	if (!dir) return null;
 
 	const addDirPaths = getAddDirPaths(directoryId, addDirectoryIds);
-	const sessionName = `zanki-ticket-${ticketId}`;
+	const sessionName = `plx-ticket-${ticketId}`;
 
 	// Immediately update status
 	db.prepare(
@@ -156,7 +156,7 @@ export function startTicket(params: StartParams): StartResult | null {
 	const branchName = (dir.branch_template || "{title}")
 		.replace("{title}", slugify(ticket.title))
 		.replace("{id}", ticketId.slice(0, 8));
-	const worktreeDir = path.join(dir.path, ".zanki-worktrees", ticketId);
+	const worktreeDir = path.join(dir.path, ".plx-worktrees", ticketId);
 
 	let worktreePath: string | null = null;
 	const baseCommit = getHeadCommit(dir.path, dir.main_branch);

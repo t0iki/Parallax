@@ -1,13 +1,13 @@
 {
-	"name": "Zanki",
+	"name": "parallax",
 	"version": "1.0.0",
 	"description": "",
 	"type": "module",
 	"bin": {
-		"zanki": "./bin/zanki.sh"
+		"plx": "./bin/plx.sh"
 	},
 	"scripts": {
-		"start": "./bin/zanki.sh",
+		"start": "./bin/plx.sh",
 		"dev": "vite",
 		"dev:server": "tsx watch server/index.ts",
 		"build": "tsc -b && vite build",

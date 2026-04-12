@@ -6,7 +6,7 @@ import { createPullRequest, fetchGitHubIssue } from "./github.js";
 const API_BASE = "http://localhost:3001/api";
 
 const server = new McpServer({
-	name: "zanki-todo",
+	name: "plx-todo",
 	version: "1.0.0",
 });
 

@@ -30,7 +30,7 @@ export function tmuxListTicketSessions(): string[] {
 		)
 			.toString()
 			.trim();
-		return output.split("\n").filter((s) => s.startsWith("zanki-ticket-"));
+		return output.split("\n").filter((s) => s.startsWith("plx-ticket-"));
 	} catch {
 		return [];
 	}

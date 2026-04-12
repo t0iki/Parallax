@@ -9,6 +9,6 @@ setup:
 	@command -v tmux >/dev/null 2>&1 || { echo "Installing tmux..."; brew install tmux; }
 	@echo "Installing dependencies..."
 	@pnpm install
-	@echo "Linking zanki command..."
+	@echo "Linking plx command..."
 	@pnpm link --global
-	@echo "Setup complete. Run 'zanki' to start."
+	@echo "Setup complete. Run 'plx' to start."

@@ -1,6 +1,6 @@
 {
 	"mcpServers": {
-		"zanki-todo": {
+		"plx-todo": {
 			"command": "server/run-mcp.sh",
 			"args": []
 		}
