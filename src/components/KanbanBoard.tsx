@@ -223,8 +223,24 @@ function TicketCard({
 				}}
 			>
 				{sessionStatus === "idle" && (
-					<span title="入力待ち" style={{ fontSize: 12, flexShrink: 0 }}>
-						❗
+					<span
+						title="停止中"
+						style={{
+							display: "inline-flex",
+							alignItems: "center",
+							justifyContent: "center",
+							width: 18,
+							height: 18,
+							borderRadius: "50%",
+							backgroundColor: theme.yellow,
+							color: "#fff",
+							fontSize: 11,
+							fontWeight: 700,
+							flexShrink: 0,
+							lineHeight: 1,
+						}}
+					>
+						!
 					</span>
 				)}
 				{sessionStatus === "error" && (
