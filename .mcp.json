@@ -1,0 +1,8 @@
+{
+	"mcpServers": {
+		"zanki-todo": {
+			"command": "server/run-mcp.sh",
+			"args": []
+		}
+	}
+}
