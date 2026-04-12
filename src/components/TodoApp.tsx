@@ -240,6 +240,7 @@ export function TodoApp() {
 				onChangeStatus={changeStatus}
 				onDelete={deleteTicket}
 				onStart={handleStart}
+				onDecompose={decomposeTicket}
 				onTicketClick={handleTicketClick}
 				selectedTicketId={selectedTicketId}
 			/>
@@ -251,7 +252,6 @@ export function TodoApp() {
 					onClose={() => setSelectedTicketId(null)}
 					onUpdate={updateTicket}
 					onCreatePR={createPR}
-					onDecompose={decomposeTicket}
 				/>
 			)}
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Directory } from "../types/directory";
 import {
 	STATUS_LABELS,
@@ -16,6 +16,7 @@ type Props = {
 	onChangeStatus: (id: string, status: Status) => void;
 	onDelete: (id: string) => void;
 	onStart: (ticketId: string) => void;
+	onDecompose: (ticketId: string) => void;
 	onTicketClick: (ticketId: string) => void;
 	selectedTicketId: string | null;
 };
@@ -34,8 +35,11 @@ function TicketCard({
 	blockedByNames,
 	isSelected,
 	directoryName,
+	menuOpen,
 	onDelete,
 	onStart,
+	onDecompose,
+	onToggleMenu,
 	onClick,
 }: {
 	ticket: Ticket;
@@ -43,8 +47,11 @@ function TicketCard({
 	blockedByNames: string[];
 	isSelected: boolean;
 	directoryName: string | null;
+	menuOpen: boolean;
 	onDelete: (id: string) => void;
 	onStart: (ticketId: string) => void;
+	onDecompose: (ticketId: string) => void;
+	onToggleMenu: (ticketId: string) => void;
 	onClick: () => void;
 }) {
 	return (
@@ -93,7 +100,10 @@ function TicketCard({
 				>
 					<button
 						type="button"
-						onClick={() => onStart(ticket.id)}
+						onClick={(e) => {
+							e.stopPropagation();
+							onStart(ticket.id);
+						}}
 						style={{
 							padding: "2px 6px",
 							fontSize: 11,
@@ -124,21 +134,94 @@ function TicketCard({
 					{childCount > 0 && (
 						<span style={{ fontSize: 11, color: "#888" }}>{childCount}件</span>
 					)}
-					<button
-						type="button"
-						onClick={() => onDelete(ticket.id)}
-						style={{
-							padding: "2px 6px",
-							fontSize: 11,
-							backgroundColor: "transparent",
-							color: "#666",
-							border: "1px solid #333",
-							borderRadius: 4,
-							cursor: "pointer",
-						}}
-					>
-						削除
-					</button>
+					<div style={{ position: "relative" }}>
+						<button
+							type="button"
+							onClick={(e) => {
+								e.stopPropagation();
+								onToggleMenu(ticket.id);
+							}}
+							style={{
+								all: "unset",
+								cursor: "pointer",
+								padding: "2px 4px",
+								fontSize: 14,
+								color: "#666",
+								lineHeight: 1,
+							}}
+						>
+							⋯
+						</button>
+						{menuOpen && (
+							<div
+								style={{
+									position: "absolute",
+									right: 0,
+									top: "100%",
+									marginTop: 4,
+									backgroundColor: "#1e1e2e",
+									border: "1px solid #2a2a35",
+									borderRadius: 6,
+									padding: 4,
+									zIndex: 20,
+									minWidth: 120,
+									display: "flex",
+									flexDirection: "column",
+								}}
+							>
+								<button
+									type="button"
+									onClick={(e) => {
+										e.stopPropagation();
+										onToggleMenu("");
+										onDecompose(ticket.id);
+									}}
+									style={{
+										all: "unset",
+										padding: "6px 10px",
+										fontSize: 12,
+										color: "#58a6ff",
+										cursor: "pointer",
+										borderRadius: 4,
+									}}
+									onMouseEnter={(e) => {
+										(e.target as HTMLElement).style.backgroundColor = "#2a2a40";
+									}}
+									onMouseLeave={(e) => {
+										(e.target as HTMLElement).style.backgroundColor =
+											"transparent";
+									}}
+								>
+									タスク分解
+								</button>
+								<button
+									type="button"
+									onClick={(e) => {
+										e.stopPropagation();
+										onToggleMenu("");
+										onDelete(ticket.id);
+									}}
+									style={{
+										all: "unset",
+										padding: "6px 10px",
+										fontSize: 12,
+										color: "#f85149",
+										cursor: "pointer",
+										borderRadius: 4,
+									}}
+									onMouseEnter={(e) => {
+										(e.target as HTMLElement).style.backgroundColor = "#2a2a40";
+									}}
+									onMouseLeave={(e) => {
+										(e.target as HTMLElement).style.backgroundColor =
+											"transparent";
+									}}
+								>
+									削除
+								</button>
+							</div>
+						)}
+					</div>
 				</div>
 			</div>
 			{ticket.startPhase && ticket.startPhase !== "running" && (
@@ -319,10 +402,21 @@ export function KanbanBoard({
 	onChangeStatus,
 	onDelete,
 	onStart,
+	onDecompose,
 	onTicketClick,
 	selectedTicketId,
 }: Props) {
 	const dirMap = new Map(directories.map((d) => [d.id, d.name]));
+	const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+	// 外側クリックでメニューを閉じる
+	useEffect(() => {
+		if (!openMenuId) return;
+		const close = () => setOpenMenuId(null);
+		document.addEventListener("click", close);
+		return () => document.removeEventListener("click", close);
+	}, [openMenuId]);
+
 	const handleDrop = (e: React.DragEvent, status: Status) => {
 		e.preventDefault();
 		const id = e.dataTransfer.getData("ticket-id");
@@ -426,8 +520,13 @@ export function KanbanBoard({
 													? (dirMap.get(ticket.workDirectoryId) ?? null)
 													: null
 											}
+											menuOpen={openMenuId === ticket.id}
 											onDelete={onDelete}
 											onStart={onStart}
+											onDecompose={onDecompose}
+											onToggleMenu={(id) =>
+												setOpenMenuId(openMenuId === id ? null : id)
+											}
 											onClick={() => onTicketClick(ticket.id)}
 										/>
 										{children.map((child) => (
