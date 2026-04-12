@@ -128,6 +128,40 @@ export function TodoApp() {
 		});
 	};
 
+	const applyChanges = async (ticketId: string) => {
+		const ticket = tickets.find((t) => t.id === ticketId);
+		if (!ticket?.worktreePath || !ticket.workDirectoryId) return;
+		const dir = directories.find((d) => d.id === ticket.workDirectoryId);
+		if (!dir) return;
+		await fetch("/api/sessions/main/send-keys", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				text: `以下のworktreeの変更をメインディレクトリに反映してください。
+1. worktree "${ticket.worktreePath}" でbase_commit "${ticket.baseCommit}" からの差分をpatchファイルとして生成 (git diff ${ticket.baseCommit} > /tmp/plx-patch-${ticketId}.patch)
+2. メインディレクトリ "${dir.path}" でそのpatchを適用 (cd "${dir.path}" && git apply /tmp/plx-patch-${ticketId}.patch)
+3. 適用したファイル一覧を表示してください`,
+			}),
+		});
+	};
+
+	const revertChanges = async (ticketId: string) => {
+		const ticket = tickets.find((t) => t.id === ticketId);
+		if (!ticket?.workDirectoryId) return;
+		const dir = directories.find((d) => d.id === ticket.workDirectoryId);
+		if (!dir) return;
+		await fetch("/api/sessions/main/send-keys", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				text: `メインディレクトリ "${dir.path}" に先ほど反映したチケット "${ticket.title}" の変更を元に戻してください。
+1. patchファイル /tmp/plx-patch-${ticketId}.patch が残っていればそれを使って git apply --reverse で戻す
+2. patchファイルがなければ git checkout -- . で変更を戻す（ただし他の変更も戻る旨を警告してください）
+3. 戻したファイル一覧を表示してください`,
+			}),
+		});
+	};
+
 	const createPR = async (ticketId: string) => {
 		const session = activeSessions.find((s) => s.ticketId === ticketId);
 		if (!session) return;
@@ -340,6 +374,8 @@ export function TodoApp() {
 					onClose={() => setSelectedTicketId(null)}
 					onUpdate={updateTicket}
 					onCreatePR={createPR}
+					onApply={applyChanges}
+					onRevert={revertChanges}
 				/>
 			)}
 

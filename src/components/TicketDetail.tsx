@@ -14,6 +14,8 @@ type Props = {
 		fields: { title?: string; description?: string },
 	) => void;
 	onCreatePR: (ticketId: string) => void;
+	onApply: (ticketId: string) => void;
+	onRevert: (ticketId: string) => void;
 };
 
 function Overview({
@@ -117,6 +119,8 @@ export function TicketDetail({
 	onClose,
 	onUpdate,
 	onCreatePR,
+	onApply,
+	onRevert,
 }: Props) {
 	const [tab, setTab] = useState<DetailTab>("overview");
 	const [widthPercent, setWidthPercent] = useState(60);
@@ -249,22 +253,56 @@ export function TicketDetail({
 						{ticket.title}
 					</span>
 					{session && (
-						<button
-							type="button"
-							onClick={() => onCreatePR(ticket.id)}
-							style={{
-								padding: "4px 10px",
-								fontSize: 11,
-								backgroundColor: "#2563eb",
-								color: "#fff",
-								border: "none",
-								borderRadius: 4,
-								cursor: "pointer",
-								whiteSpace: "nowrap",
-							}}
-						>
-							PR作成
-						</button>
+						<>
+							<button
+								type="button"
+								onClick={() => onApply(ticket.id)}
+								style={{
+									padding: "4px 10px",
+									fontSize: 11,
+									backgroundColor: "transparent",
+									color: "#43a047",
+									border: "1px solid #2e7d32",
+									borderRadius: 4,
+									cursor: "pointer",
+									whiteSpace: "nowrap",
+								}}
+							>
+								反映
+							</button>
+							<button
+								type="button"
+								onClick={() => onRevert(ticket.id)}
+								style={{
+									padding: "4px 10px",
+									fontSize: 11,
+									backgroundColor: "transparent",
+									color: "#c68a1a",
+									border: "1px solid #3d3520",
+									borderRadius: 4,
+									cursor: "pointer",
+									whiteSpace: "nowrap",
+								}}
+							>
+								元に戻す
+							</button>
+							<button
+								type="button"
+								onClick={() => onCreatePR(ticket.id)}
+								style={{
+									padding: "4px 10px",
+									fontSize: 11,
+									backgroundColor: "#2563eb",
+									color: "#fff",
+									border: "none",
+									borderRadius: 4,
+									cursor: "pointer",
+									whiteSpace: "nowrap",
+								}}
+							>
+								PR作成
+							</button>
+						</>
 					)}
 					<button
 						type="button"
