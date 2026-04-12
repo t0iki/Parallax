@@ -25,46 +25,51 @@ function extractSessionId(output: string): string | null {
 	return match?.[1] ?? null;
 }
 
-function restartClaude(sessionName: string): void {
+function sleep(ms: number): Promise<void> {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function restartClaude(sessionName: string): Promise<void> {
+	const send = (text: string) => {
+		try {
+			execSync(
+				`tmux send-keys -t "${sessionName}" "${text}" Enter 2>/dev/null`,
+			);
+		} catch {
+			// ignore
+		}
+	};
+
 	try {
-		// ターミナルにメッセージ表示
-		execSync(`tmux send-keys -t "${sessionName}" '' Enter 2>/dev/null`);
-		execSync(
-			`tmux send-keys -t "${sessionName}" 'echo "🔄 [Parallax Watchdog] API接続エラーを検知しました。セッションを再起動します..."' Enter 2>/dev/null`,
+		// Step 1: メッセージ表示
+		send(
+			"echo '[Parallax Watchdog] API connection error detected. Restarting...'",
 		);
+		await sleep(1000);
 
-		// /quit を送ってセッションIDを取得
-		setTimeout(() => {
-			execSync(`tmux send-keys -t "${sessionName}" '/quit' Enter 2>/dev/null`);
-		}, 1000);
+		// Step 2: /quit でセッションIDを取得
+		send("/quit");
+		await sleep(5000);
 
-		// /quit の出力を待ってからセッションIDを取得して再起動
-		setTimeout(() => {
-			const output = capturePaneOutput(sessionName, 30);
-			const sessionId = extractSessionId(output);
+		// Step 3: セッションIDを抽出
+		const output = capturePaneOutput(sessionName, 30);
+		const sessionId = extractSessionId(output);
 
-			const parts = [LAUNCHER, "--dangerously-skip-permissions"];
-			if (sessionId) parts.push("--resume", sessionId);
-			const cmd = parts.join(" ");
+		// Step 4: 再起動メッセージ
+		const msg = sessionId
+			? `echo '[Parallax Watchdog] Resuming session ${sessionId}'`
+			: "echo '[Parallax Watchdog] Restarting Claude Code'";
+		send(msg);
+		await sleep(500);
 
-			try {
-				const msg = sessionId
-					? `[Parallax Watchdog] Resuming session ${sessionId}`
-					: "[Parallax Watchdog] Restarting Claude Code";
-				execSync(
-					`tmux send-keys -t "${sessionName}" "echo '${msg}'" Enter 2>/dev/null`,
-				);
-				// コマンドをそのまま送信（クォートなし）
-				execSync(
-					`tmux send-keys -t "${sessionName}" "${cmd}" Enter 2>/dev/null`,
-				);
-				console.log(
-					`[watchdog] Restarted Claude Code in ${sessionName}${sessionId ? ` (resume: ${sessionId})` : ""}`,
-				);
-			} catch {
-				// ignore
-			}
-		}, 3000);
+		// Step 5: Claude Code 起動
+		const parts = [LAUNCHER, "--dangerously-skip-permissions"];
+		if (sessionId) parts.push("--resume", sessionId);
+		send(parts.join(" "));
+
+		console.log(
+			`[watchdog] Restarted Claude Code in ${sessionName}${sessionId ? ` (resume: ${sessionId})` : ""}`,
+		);
 	} catch {
 		// ignore
 	}
