@@ -43,16 +43,20 @@ function restartClaude(sessionName: string): void {
 			const output = capturePaneOutput(sessionName, 30);
 			const sessionId = extractSessionId(output);
 
-			const resumeFlag = sessionId ? `--resume "${sessionId}"` : "";
-			const cmd =
-				`${LAUNCHER} --dangerously-skip-permissions ${resumeFlag}`.trim();
+			const parts = [LAUNCHER, "--dangerously-skip-permissions"];
+			if (sessionId) parts.push("--resume", sessionId);
+			const cmd = parts.join(" ");
 
 			try {
+				const msg = sessionId
+					? `[Parallax Watchdog] Resuming session ${sessionId}`
+					: "[Parallax Watchdog] Restarting Claude Code";
 				execSync(
-					`tmux send-keys -t "${sessionName}" 'echo "🔄 [Parallax Watchdog] 再起動中...${sessionId ? ` (session: ${sessionId})` : ""}"' Enter 2>/dev/null`,
+					`tmux send-keys -t "${sessionName}" "echo '${msg}'" Enter 2>/dev/null`,
 				);
+				// コマンドをそのまま送信（クォートなし）
 				execSync(
-					`tmux send-keys -t "${sessionName}" '${cmd.replace(/'/g, "'\\''")}' Enter 2>/dev/null`,
+					`tmux send-keys -t "${sessionName}" "${cmd}" Enter 2>/dev/null`,
 				);
 				console.log(
 					`[watchdog] Restarted Claude Code in ${sessionName}${sessionId ? ` (resume: ${sessionId})` : ""}`,
