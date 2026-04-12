@@ -22,32 +22,34 @@ function detectSessionStatus(
 			.toString()
 			.trim();
 
-		const lastLine = output.split("\n").pop() ?? "";
-		const prev = lastOutputMap.get(sessionName);
-		const now = Date.now();
-		let result: "idle" | "working" | "error";
+		const ticketId = sessionName.replace("plx-ticket-", "");
+		const ticket = db
+			.prepare("SELECT title FROM tickets WHERE id = ?")
+			.get(ticketId) as { title: string } | undefined;
+		const label = ticket?.title ?? ticketId.slice(0, 8);
 
 		if (
 			output.includes("Unable to connect") ||
 			output.includes("ConnectionRefused")
 		) {
-			result = "error";
-		} else if (prev?.hash === output) {
-			const elapsed = Math.round((now - prev.updatedAt) / 1000);
-			result = now - prev.updatedAt > IDLE_THRESHOLD_MS ? "idle" : "working";
-			console.log(
-				`[session] ${sessionName}: ${result} (unchanged ${elapsed}s) last: "${lastLine.slice(0, 80)}"`,
-			);
-			return result;
-		} else {
-			lastOutputMap.set(sessionName, { hash: output, updatedAt: now });
-			result = "working";
+			console.log(`[session] "${label}": error`);
+			return "error";
 		}
 
-		console.log(
-			`[session] ${sessionName}: ${result} last: "${lastLine.slice(0, 80)}"`,
-		);
-		return result;
+		const prev = lastOutputMap.get(sessionName);
+		const now = Date.now();
+
+		if (prev?.hash === output) {
+			const elapsed = Math.round((now - prev.updatedAt) / 1000);
+			const result =
+				now - prev.updatedAt > IDLE_THRESHOLD_MS ? "idle" : "working";
+			console.log(`[session] "${label}": ${result} (${elapsed}s)`);
+			return result;
+		}
+
+		lastOutputMap.set(sessionName, { hash: output, updatedAt: now });
+		console.log(`[session] "${label}": working (changed)`);
+		return "working";
 	} catch {
 		return "working";
 	}
