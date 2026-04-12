@@ -20,6 +20,10 @@ type Props = {
 	onResetToTodo: (ticketId: string) => void;
 	onTicketClick: (ticketId: string) => void;
 	selectedTicketId: string | null;
+	sessionStatuses: Map<
+		string,
+		{ sessionName: string; cwd: string; status: "idle" | "working" | "error" }
+	>;
 };
 
 const COLUMN_COLORS: Record<
@@ -172,6 +176,7 @@ function TicketCard({
 	blockedByNames,
 	isSelected,
 	directoryName,
+	sessionStatus,
 	menuOpen,
 	onDelete,
 	onStart,
@@ -185,6 +190,7 @@ function TicketCard({
 	blockedByNames: string[];
 	isSelected: boolean;
 	directoryName: string | null;
+	sessionStatus: "idle" | "working" | "error" | null;
 	menuOpen: boolean;
 	onDelete: (id: string) => void;
 	onStart: (ticketId: string) => void;
@@ -219,6 +225,16 @@ function TicketCard({
 					gap: 8,
 				}}
 			>
+				{sessionStatus === "idle" && (
+					<span title="入力待ち" style={{ fontSize: 12, flexShrink: 0 }}>
+						❗
+					</span>
+				)}
+				{sessionStatus === "error" && (
+					<span title="エラー" style={{ fontSize: 12, flexShrink: 0 }}>
+						⚠️
+					</span>
+				)}
 				<span
 					style={{
 						fontSize: 14,
@@ -463,6 +479,7 @@ export function KanbanBoard({
 	onResetToTodo,
 	onTicketClick,
 	selectedTicketId,
+	sessionStatuses,
 }: Props) {
 	const dirMap = new Map(directories.map((d) => [d.id, d.name]));
 	const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -577,6 +594,9 @@ export function KanbanBoard({
 												ticket.workDirectoryId
 													? (dirMap.get(ticket.workDirectoryId) ?? null)
 													: null
+											}
+											sessionStatus={
+												sessionStatuses.get(ticket.id)?.status ?? null
 											}
 											menuOpen={openMenuId === ticket.id}
 											onDelete={onDelete}

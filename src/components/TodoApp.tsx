@@ -39,7 +39,14 @@ export function TodoApp() {
 
 	// サーバー上のアクティブセッション一覧
 	const [knownSessions, setKnownSessions] = useState<
-		Map<string, { sessionName: string; cwd: string }>
+		Map<
+			string,
+			{
+				sessionName: string;
+				cwd: string;
+				status: "idle" | "working" | "error";
+			}
+		>
 	>(new Map());
 
 	useEffect(() => {
@@ -52,13 +59,22 @@ export function TodoApp() {
 							ticketId: string;
 							sessionName: string;
 							cwd: string;
+							status: "idle" | "working" | "error";
 						}[],
 					) => {
-						const map = new Map<string, { sessionName: string; cwd: string }>();
+						const map = new Map<
+							string,
+							{
+								sessionName: string;
+								cwd: string;
+								status: "idle" | "working" | "error";
+							}
+						>();
 						for (const s of sessions) {
 							map.set(s.ticketId, {
 								sessionName: s.sessionName,
 								cwd: s.cwd,
+								status: s.status,
 							});
 						}
 						setKnownSessions(map);
@@ -365,6 +381,7 @@ export function TodoApp() {
 				onResetToTodo={resetToTodo}
 				onTicketClick={handleTicketClick}
 				selectedTicketId={selectedTicketId}
+				sessionStatuses={knownSessions}
 			/>
 
 			{selectedTicket && (
