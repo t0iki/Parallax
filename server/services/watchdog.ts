@@ -27,10 +27,18 @@ function extractSessionId(output: string): string | null {
 
 function restartClaude(sessionName: string): void {
 	try {
-		// まず /quit を送ってセッションIDを取得
-		execSync(`tmux send-keys -t "${sessionName}" '/quit' Enter 2>/dev/null`);
+		// ターミナルにメッセージ表示
+		execSync(`tmux send-keys -t "${sessionName}" '' Enter 2>/dev/null`);
+		execSync(
+			`tmux send-keys -t "${sessionName}" 'echo "🔄 [Parallax Watchdog] API接続エラーを検知しました。セッションを再起動します..."' Enter 2>/dev/null`,
+		);
 
-		// /quit の出力を待ってからセッションIDを取得
+		// /quit を送ってセッションIDを取得
+		setTimeout(() => {
+			execSync(`tmux send-keys -t "${sessionName}" '/quit' Enter 2>/dev/null`);
+		}, 1000);
+
+		// /quit の出力を待ってからセッションIDを取得して再起動
 		setTimeout(() => {
 			const output = capturePaneOutput(sessionName, 30);
 			const sessionId = extractSessionId(output);
@@ -41,6 +49,9 @@ function restartClaude(sessionName: string): void {
 
 			try {
 				execSync(
+					`tmux send-keys -t "${sessionName}" 'echo "🔄 [Parallax Watchdog] 再起動中...${sessionId ? ` (session: ${sessionId})` : ""}"' Enter 2>/dev/null`,
+				);
+				execSync(
 					`tmux send-keys -t "${sessionName}" '${cmd.replace(/'/g, "'\\''")}' Enter 2>/dev/null`,
 				);
 				console.log(
@@ -49,7 +60,7 @@ function restartClaude(sessionName: string): void {
 			} catch {
 				// ignore
 			}
-		}, 2000);
+		}, 3000);
 	} catch {
 		// ignore
 	}
