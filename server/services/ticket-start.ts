@@ -182,14 +182,13 @@ export function startTicket(params: StartParams): StartResult | null {
 	if (!tmuxSessionExists(sessionName)) {
 		const mcpConfigPath = buildMcpConfig(ticketId);
 		const addDirFlags = addDirPaths.map((d) => `--add-dir "${d}"`).join(" ");
-		const claudeCmd =
-			`claude --dangerously-skip-permissions --mcp-config "${mcpConfigPath}" ${addDirFlags}`.trim();
+		const launcherPath = path.join(PLX_DIR, "bin", "launch-claude.sh");
+		const claudeArgs =
+			`--dangerously-skip-permissions --mcp-config "${mcpConfigPath}" ${addDirFlags}`.trim();
 
 		try {
-			execSync(
-				`tmux new-session -d -s "${sessionName}" -c "${effectiveCwd}" /bin/zsh -l`,
-			);
-			tmuxSendKeys(sessionName, claudeCmd);
+			execSync(`tmux new-session -d -s "${sessionName}" -c "${effectiveCwd}"`);
+			tmuxSendKeys(sessionName, `${launcherPath} ${claudeArgs}`);
 			updatePhase(ticketId, "sending_prompt");
 
 			setTimeout(() => {

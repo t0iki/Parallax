@@ -91,10 +91,11 @@ wss.on("connection", (ws, req: http.IncomingMessage) => {
 			env,
 		});
 
-		// Main session only: auto-launch Claude Code
+		// Main session only: auto-launch Claude Code via launcher
 		if (isNew && !sessionName.startsWith("plx-ticket-")) {
+			const launcherPath = path.join(PROJECT_DIR, "bin", "launch-claude.sh");
 			setTimeout(
-				() => safeWrite("claude --dangerously-skip-permissions\n"),
+				() => safeWrite(`${launcherPath} --dangerously-skip-permissions\n`),
 				500,
 			);
 		}
