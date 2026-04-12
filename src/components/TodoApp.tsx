@@ -300,9 +300,7 @@ export function TodoApp() {
 
 	// ディレクトリでフィルタされたチケット
 	const filteredTickets = filterDirId
-		? tickets.filter(
-				(t) => t.workDirectoryId === filterDirId || !t.workDirectoryId,
-			)
+		? tickets.filter((t) => t.workDirectoryId === filterDirId)
 		: tickets;
 
 	// フィルタ対象のディレクトリ（チケットが紐づいているもの）
