@@ -12,6 +12,8 @@ import { json, readBody } from "../utils.js";
 const lastOutputMap = new Map<string, { hash: string; updatedAt: number }>();
 const IDLE_THRESHOLD_MS = 60_000; // 1分
 
+const verbose = !!process.env.PLX_VERBOSE;
+
 function detectSessionStatus(
 	sessionName: string,
 ): "idle" | "working" | "error" {
@@ -32,7 +34,7 @@ function detectSessionStatus(
 			output.includes("Unable to connect") ||
 			output.includes("ConnectionRefused")
 		) {
-			console.log(`[session] "${label}": error`);
+			if (verbose) console.log(`[session] "${label}": error`);
 			return "error";
 		}
 
@@ -43,12 +45,12 @@ function detectSessionStatus(
 			const elapsed = Math.round((now - prev.updatedAt) / 1000);
 			const result =
 				now - prev.updatedAt > IDLE_THRESHOLD_MS ? "idle" : "working";
-			console.log(`[session] "${label}": ${result} (${elapsed}s)`);
+			if (verbose) console.log(`[session] "${label}": ${result} (${elapsed}s)`);
 			return result;
 		}
 
 		lastOutputMap.set(sessionName, { hash: output, updatedAt: now });
-		console.log(`[session] "${label}": working (changed)`);
+		if (verbose) console.log(`[session] "${label}": working (changed)`);
 		return "working";
 	} catch {
 		return "working";
