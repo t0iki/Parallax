@@ -3,7 +3,7 @@ import path from "node:path";
 import { tmuxListTicketSessions, tmuxSessionExists } from "./tmux.js";
 
 const PLX_DIR = import.meta.dirname
-	? path.join(import.meta.dirname, "..")
+	? path.join(import.meta.dirname, "..", "..")
 	: process.cwd();
 
 const LAUNCHER = path.join(PLX_DIR, "bin", "launch-claude.sh");

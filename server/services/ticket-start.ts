@@ -7,7 +7,7 @@ import { createWorktree, getHeadCommit, slugify } from "./git.js";
 import { tmuxSendKeys, tmuxSessionExists } from "./tmux.js";
 
 const PLX_DIR = import.meta.dirname
-	? path.join(import.meta.dirname, "..")
+	? path.join(import.meta.dirname, "..", "..")
 	: process.cwd();
 
 interface StartParams {
