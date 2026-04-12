@@ -12,27 +12,28 @@ Browser-based task management with Claude Code integration. Run multiple Claude 
 
 ```bash
 pnpm install
+pnpm link --global  # makes `zanki` command available globally
 ```
 
 ## Usage
 
-Start two processes in separate terminals:
-
 ```bash
-# API server + WebSocket server (port 3001, hot reload)
-pnpm dev:server
-
-# Vite dev server (port 5173)
-pnpm dev
+zanki
 ```
 
-Open http://localhost:5173.
+Opens at http://localhost:5173. Starts both the API server (port 3001) and Vite dev server. Press Ctrl+C to stop.
+
+Alternatively, from the project directory:
+
+```bash
+pnpm start
+```
 
 ### Workflow
 
 1. **Settings** — Register working directories (repo path, main branch, branch naming template)
-2. **Create tickets** — Add tickets to the board, optionally with descriptions and subtasks
-3. **Start a ticket** — Click ▶, select a directory. Zanki creates a git worktree and launches Claude Code in a tmux session
-4. **Monitor** — Click a ticket to view its terminal, diff, or edit its description
+2. **Create tickets** — Add tickets to the board with descriptions and subtasks
+3. **Start a ticket** — Click ▶, select a directory. Zanki creates a git worktree and launches Claude Code in a background tmux session
+4. **Monitor** — Click a ticket to view its terminal, diff, or edit its description. Work continues even when the browser is closed
 5. **Create PR** — Click "PR作成" in the ticket detail panel
 6. **Delete** — Removes the ticket, worktree, branch, and tmux session

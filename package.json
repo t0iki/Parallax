@@ -3,7 +3,11 @@
 	"version": "1.0.0",
 	"description": "",
 	"type": "module",
+	"bin": {
+		"zanki": "./bin/zanki.sh"
+	},
 	"scripts": {
+		"start": "./bin/zanki.sh",
 		"dev": "vite",
 		"dev:server": "tsx watch server/index.ts",
 		"build": "tsc -b && vite build",
