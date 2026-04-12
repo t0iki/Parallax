@@ -232,7 +232,7 @@ function TicketCard({
 							width: 18,
 							height: 18,
 							borderRadius: "50%",
-							backgroundColor: theme.yellow,
+							backgroundColor: theme.red,
 							color: "#fff",
 							fontSize: 11,
 							fontWeight: 700,
