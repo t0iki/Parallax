@@ -224,6 +224,20 @@ export function TodoApp() {
 	const selectedSession =
 		activeSessions.find((s) => s.ticketId === selectedTicketId) ?? null;
 
+	const [filterDirId, setFilterDirId] = useState<string | null>(null);
+
+	// ディレクトリでフィルタされたチケット
+	const filteredTickets = filterDirId
+		? tickets.filter(
+				(t) => t.workDirectoryId === filterDirId || !t.workDirectoryId,
+			)
+		: tickets;
+
+	// フィルタ対象のディレクトリ（チケットが紐づいているもの）
+	const activeDirectories = directories.filter((d) =>
+		tickets.some((t) => t.workDirectoryId === d.id),
+	);
+
 	return (
 		<div
 			style={{
@@ -232,8 +246,61 @@ export function TodoApp() {
 				padding: 24,
 			}}
 		>
+			{activeDirectories.length > 0 && (
+				<div
+					style={{
+						display: "flex",
+						gap: 0,
+						marginBottom: 16,
+						borderBottom: "1px solid #2a2a35",
+					}}
+				>
+					<button
+						type="button"
+						onClick={() => setFilterDirId(null)}
+						style={{
+							padding: "6px 14px",
+							fontSize: 12,
+							border: "none",
+							borderBottom:
+								filterDirId === null
+									? "2px solid #2563eb"
+									: "2px solid transparent",
+							backgroundColor: "transparent",
+							color: filterDirId === null ? "#ccc" : "#666",
+							cursor: "pointer",
+						}}
+					>
+						All
+					</button>
+					{activeDirectories.map((d) => (
+						<button
+							key={d.id}
+							type="button"
+							onClick={() => setFilterDirId(d.id)}
+							style={{
+								padding: "6px 14px",
+								fontSize: 12,
+								border: "none",
+								borderBottom:
+									filterDirId === d.id
+										? "2px solid #2563eb"
+										: "2px solid transparent",
+								backgroundColor: "transparent",
+								color: filterDirId === d.id ? "#ccc" : "#666",
+								cursor: "pointer",
+							}}
+						>
+							{d.name}
+							<span style={{ marginLeft: 4, fontSize: 10, color: "#555" }}>
+								{tickets.filter((t) => t.workDirectoryId === d.id).length}
+							</span>
+						</button>
+					))}
+				</div>
+			)}
 			<KanbanBoard
-				tickets={tickets}
+				tickets={filteredTickets}
 				dependencies={dependencies}
 				directories={directories}
 				onAdd={addTicket}
