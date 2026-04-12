@@ -319,15 +319,12 @@ function SubTicketCard({
 }) {
 	return (
 		<li
-			draggable
-			onDragStart={(e) => e.dataTransfer.setData("ticket-id", ticket.id)}
 			style={{
 				padding: "6px 10px",
 				marginLeft: 12,
 				backgroundColor: "#1a1a28",
 				borderRadius: 4,
 				borderLeft: "2px solid #2a2a35",
-				cursor: "grab",
 				display: "flex",
 				flexDirection: "column",
 				gap: 4,
