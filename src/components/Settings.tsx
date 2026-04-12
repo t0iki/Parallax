@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
+import { useTheme } from "../lib/ThemeContext";
 import type { Directory } from "../types/directory";
 
-const INPUT_STYLE: React.CSSProperties = {
-	padding: "6px 8px",
-	fontSize: 13,
-	border: "1px solid #2a2a35",
-	borderRadius: 4,
-	backgroundColor: "#16161e",
-	color: "#ccc",
-};
-
 export function Settings() {
+	const { theme } = useTheme();
+
+	const INPUT_STYLE: React.CSSProperties = {
+		padding: "6px 8px",
+		fontSize: 13,
+		border: `1px solid ${theme.border}`,
+		borderRadius: 4,
+		backgroundColor: theme.bgInput,
+		color: theme.text,
+	};
 	const [directories, setDirectories] = useState<Directory[]>([]);
 	const [name, setName] = useState("");
 	const [dirPath, setDirPath] = useState("");
@@ -106,13 +108,17 @@ export function Settings() {
 				height: "100%",
 				overflow: "auto",
 				padding: 24,
-				color: "#ddd",
+				color: theme.text,
 			}}
 		>
-			<h2 style={{ fontSize: 18, margin: "0 0 20px", color: "#bbb" }}>設定</h2>
+			<h2 style={{ fontSize: 18, margin: "0 0 20px", color: theme.textLabel }}>
+				設定
+			</h2>
 
 			<section>
-				<h3 style={{ fontSize: 15, margin: "0 0 12px", color: "#999" }}>
+				<h3
+					style={{ fontSize: 15, margin: "0 0 12px", color: theme.textMuted }}
+				>
 					作業ディレクトリ
 				</h3>
 
@@ -154,7 +160,7 @@ export function Settings() {
 						style={{
 							padding: "6px 14px",
 							fontSize: 13,
-							backgroundColor: "#2563eb",
+							backgroundColor: theme.accent,
 							color: "#fff",
 							border: "none",
 							borderRadius: 4,
@@ -167,7 +173,7 @@ export function Settings() {
 				</form>
 
 				{directories.length === 0 ? (
-					<p style={{ color: "#555", fontSize: 13 }}>
+					<p style={{ color: theme.textDim, fontSize: 13 }}>
 						ディレクトリが登録されていません
 					</p>
 				) : (
@@ -181,9 +187,9 @@ export function Settings() {
 									gap: 8,
 									padding: "8px 12px",
 									marginBottom: 4,
-									backgroundColor: "#1e1e2e",
+									backgroundColor: theme.bgCard,
 									borderRadius: 6,
-									border: "1px solid #2a2a35",
+									border: `1px solid ${theme.border}`,
 								}}
 							>
 								{editingId === dir.id ? (
@@ -220,7 +226,7 @@ export function Settings() {
 											style={{
 												padding: "4px 10px",
 												fontSize: 12,
-												backgroundColor: "#2563eb",
+												backgroundColor: theme.accent,
 												color: "#fff",
 												border: "none",
 												borderRadius: 4,
@@ -236,8 +242,8 @@ export function Settings() {
 												padding: "4px 10px",
 												fontSize: 12,
 												backgroundColor: "transparent",
-												color: "#888",
-												border: "1px solid #333",
+												color: theme.textMuted,
+												border: `1px solid ${theme.border}`,
 												borderRadius: 4,
 												cursor: "pointer",
 											}}
@@ -251,7 +257,7 @@ export function Settings() {
 											style={{
 												fontSize: 13,
 												fontWeight: 600,
-												color: "#ccc",
+												color: theme.text,
 												minWidth: 80,
 											}}
 										>
@@ -261,7 +267,7 @@ export function Settings() {
 											style={{
 												flex: 1,
 												fontSize: 13,
-												color: "#888",
+												color: theme.textMuted,
 												fontFamily: "monospace",
 											}}
 										>
@@ -270,7 +276,7 @@ export function Settings() {
 										<span
 											style={{
 												fontSize: 12,
-												color: "#6c8ebf",
+												color: theme.link,
 												fontFamily: "monospace",
 											}}
 										>
@@ -279,7 +285,7 @@ export function Settings() {
 										<span
 											style={{
 												fontSize: 11,
-												color: "#888",
+												color: theme.textMuted,
 												fontFamily: "monospace",
 											}}
 										>
@@ -292,8 +298,8 @@ export function Settings() {
 												padding: "3px 8px",
 												fontSize: 11,
 												backgroundColor: "transparent",
-												color: "#888",
-												border: "1px solid #333",
+												color: theme.textMuted,
+												border: `1px solid ${theme.border}`,
 												borderRadius: 4,
 												cursor: "pointer",
 											}}
@@ -307,8 +313,8 @@ export function Settings() {
 												padding: "3px 8px",
 												fontSize: 11,
 												backgroundColor: "transparent",
-												color: "#666",
-												border: "1px solid #333",
+												color: theme.textDim,
+												border: `1px solid ${theme.border}`,
 												borderRadius: 4,
 												cursor: "pointer",
 											}}

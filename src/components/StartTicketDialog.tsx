@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTheme } from "../lib/ThemeContext";
 import type { Directory } from "../types/directory";
 import type { Ticket } from "../types/ticket";
 
@@ -19,6 +20,7 @@ export function StartTicketDialog({
 	onConfirm,
 	onCancel,
 }: Props) {
+	const { theme } = useTheme();
 	const [selectedDirId, setSelectedDirId] = useState(directories[0]?.id ?? "");
 	const [addDirIds, setAddDirIds] = useState<string[]>([]);
 
@@ -50,20 +52,20 @@ export function StartTicketDialog({
 				onClick={(e) => e.stopPropagation()}
 				onKeyDown={() => {}}
 				style={{
-					backgroundColor: "#1e1e2e",
-					border: "1px solid #2a2a35",
+					backgroundColor: theme.bgCard,
+					border: `1px solid ${theme.border}`,
 					borderRadius: 10,
 					padding: 24,
 					minWidth: 360,
 					maxWidth: 480,
-					color: "#ddd",
+					color: theme.text,
 				}}
 			>
 				<h3 style={{ margin: "0 0 16px", fontSize: 16 }}>チケットを開始</h3>
 				<p
 					style={{
 						fontSize: 13,
-						color: "#999",
+						color: theme.textMuted,
 						margin: "0 0 16px",
 						wordBreak: "break-word",
 					}}
@@ -76,7 +78,7 @@ export function StartTicketDialog({
 						style={{
 							display: "block",
 							fontSize: 13,
-							color: "#aaa",
+							color: theme.textLabel,
 							marginBottom: 6,
 						}}
 					>
@@ -95,9 +97,9 @@ export function StartTicketDialog({
 								marginTop: 4,
 								padding: "6px 8px",
 								fontSize: 13,
-								backgroundColor: "#16161e",
-								color: "#ccc",
-								border: "1px solid #2a2a35",
+								backgroundColor: theme.bgInput,
+								color: theme.text,
+								border: `1px solid ${theme.border}`,
 								borderRadius: 4,
 							}}
 						>
@@ -116,7 +118,7 @@ export function StartTicketDialog({
 							style={{
 								display: "block",
 								fontSize: 13,
-								color: "#aaa",
+								color: theme.textLabel,
 								marginBottom: 6,
 							}}
 						>
@@ -130,7 +132,7 @@ export function StartTicketDialog({
 									alignItems: "center",
 									gap: 8,
 									fontSize: 13,
-									color: "#bbb",
+									color: theme.textLabel,
 									padding: "3px 0",
 									cursor: "pointer",
 								}}
@@ -143,7 +145,7 @@ export function StartTicketDialog({
 								{d.name}
 								<span
 									style={{
-										color: "#666",
+										color: theme.textDim,
 										fontFamily: "monospace",
 										fontSize: 11,
 									}}
@@ -163,8 +165,8 @@ export function StartTicketDialog({
 							padding: "6px 14px",
 							fontSize: 13,
 							backgroundColor: "transparent",
-							color: "#888",
-							border: "1px solid #333",
+							color: theme.textMuted,
+							border: `1px solid ${theme.border}`,
 							borderRadius: 4,
 							cursor: "pointer",
 						}}
@@ -180,7 +182,7 @@ export function StartTicketDialog({
 						style={{
 							padding: "6px 14px",
 							fontSize: 13,
-							backgroundColor: "#2563eb",
+							backgroundColor: theme.accent,
 							color: "#fff",
 							border: "none",
 							borderRadius: 4,

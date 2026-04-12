@@ -2,10 +2,12 @@ import { useCallback, useRef, useState } from "react";
 import { Settings } from "./components/Settings";
 import { Terminal } from "./components/Terminal";
 import { TodoApp } from "./components/TodoApp";
+import { useTheme } from "./lib/ThemeContext";
 
 type Page = "todo" | "settings";
 
 export function App() {
+	const { theme, mode, toggle } = useTheme();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [leftWidthPercent, setLeftWidthPercent] = useState(33);
 	const dragging = useRef(false);
@@ -39,7 +41,7 @@ export function App() {
 	return (
 		<div
 			ref={containerRef}
-			style={{ height: "100vh", display: "flex", backgroundColor: "#121218" }}
+			style={{ height: "100vh", display: "flex", backgroundColor: theme.bg }}
 		>
 			<div style={{ width: `${leftWidthPercent}%`, minWidth: 0 }}>
 				<Terminal />
@@ -62,7 +64,7 @@ export function App() {
 						top: 0,
 						bottom: 0,
 						width: 1,
-						backgroundColor: "#2a2a35",
+						backgroundColor: theme.border,
 					}}
 				/>
 			</div>
@@ -80,7 +82,7 @@ export function App() {
 						display: "flex",
 						alignItems: "center",
 						padding: "0 16px",
-						borderBottom: "1px solid #2a2a35",
+						borderBottom: `1px solid ${theme.border}`,
 						flexShrink: 0,
 					}}
 				>
@@ -99,9 +101,11 @@ export function App() {
 								fontSize: 13,
 								border: "none",
 								borderBottom:
-									page === key ? "2px solid #2563eb" : "2px solid transparent",
+									page === key
+										? `2px solid ${theme.accent}`
+										: "2px solid transparent",
 								backgroundColor: "transparent",
-								color: page === key ? "#ccc" : "#666",
+								color: page === key ? theme.text : theme.textDim,
 								fontWeight: page === key ? 600 : 400,
 								cursor: "pointer",
 							}}
@@ -109,6 +113,45 @@ export function App() {
 							{label}
 						</button>
 					))}
+					{/* biome-ignore lint/a11y/noStaticElementInteractions: theme toggle */}
+					<div
+						onClick={toggle}
+						onKeyDown={() => {}}
+						title={
+							mode === "dark"
+								? "ライトモードに切り替え"
+								: "ダークモードに切り替え"
+						}
+						style={{
+							marginLeft: "auto",
+							width: 44,
+							height: 22,
+							borderRadius: 11,
+							backgroundColor: mode === "dark" ? theme.border : theme.accent,
+							cursor: "pointer",
+							position: "relative",
+							transition: "background-color 0.2s",
+						}}
+					>
+						<div
+							style={{
+								position: "absolute",
+								top: 2,
+								left: mode === "dark" ? 2 : 24,
+								width: 18,
+								height: 18,
+								borderRadius: "50%",
+								backgroundColor: "#fff",
+								transition: "left 0.2s",
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								fontSize: 10,
+							}}
+						>
+							{mode === "dark" ? "🌙" : "☀️"}
+						</div>
+					</div>
 				</nav>
 				<div style={{ flex: 1, overflow: "auto" }}>
 					{page === "todo" ? <TodoApp /> : <Settings />}

@@ -2,6 +2,7 @@ import { FitAddon } from "@xterm/addon-fit";
 import { Terminal as XTerm } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 import { useEffect, useRef } from "react";
+import { useTheme } from "../lib/ThemeContext";
 
 type TerminalProps = {
 	sessionName?: string;
@@ -16,6 +17,7 @@ export function Terminal({
 	addDirs,
 	label = "Terminal",
 }: TerminalProps) {
+	const { theme } = useTheme();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const addDirsKey = addDirs?.join(",") ?? "";
 
@@ -90,7 +92,7 @@ export function Terminal({
 				height: "100%",
 				display: "flex",
 				flexDirection: "column",
-				backgroundColor: "#121218",
+				backgroundColor: theme.bg,
 				padding: 12,
 				boxSizing: "border-box",
 				gap: 8,
@@ -109,10 +111,10 @@ export function Terminal({
 						width: 8,
 						height: 8,
 						borderRadius: "50%",
-						backgroundColor: "#43a047",
+						backgroundColor: theme.green,
 					}}
 				/>
-				<span style={{ fontWeight: 600, fontSize: 14, color: "#aaa" }}>
+				<span style={{ fontWeight: 600, fontSize: 14, color: theme.textLabel }}>
 					{label}
 				</span>
 			</div>
@@ -121,7 +123,7 @@ export function Terminal({
 					flex: 1,
 					borderRadius: 8,
 					overflow: "hidden",
-					border: "1px solid #2a2a35",
+					border: `1px solid ${theme.border}`,
 				}}
 			>
 				<div

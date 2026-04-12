@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTheme } from "../lib/ThemeContext";
 import type { Ticket } from "../types/ticket";
 import { DiffView } from "./DiffView";
 import { Terminal } from "./Terminal";
@@ -28,6 +29,7 @@ function Overview({
 		fields: { title?: string; description?: string },
 	) => void;
 }) {
+	const { theme } = useTheme();
 	const [title, setTitle] = useState(ticket.title);
 	const [description, setDescription] = useState(ticket.description);
 	const titleChanged = title !== ticket.title;
@@ -53,7 +55,7 @@ function Overview({
 			}}
 		>
 			<label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-				<span style={{ fontSize: 12, color: "#888" }}>タイトル</span>
+				<span style={{ fontSize: 12, color: theme.textMuted }}>タイトル</span>
 				<input
 					type="text"
 					value={title}
@@ -62,9 +64,9 @@ function Overview({
 					style={{
 						padding: "8px 10px",
 						fontSize: 14,
-						backgroundColor: "#16161e",
-						color: "#ddd",
-						border: "1px solid #2a2a35",
+						backgroundColor: theme.bgInput,
+						color: theme.text,
+						border: `1px solid ${theme.border}`,
 						borderRadius: 4,
 					}}
 				/>
@@ -77,7 +79,7 @@ function Overview({
 					flex: 1,
 				}}
 			>
-				<span style={{ fontSize: 12, color: "#888" }}>説明</span>
+				<span style={{ fontSize: 12, color: theme.textMuted }}>説明</span>
 				<textarea
 					value={description}
 					onChange={(e) => setDescription(e.target.value)}
@@ -88,9 +90,9 @@ function Overview({
 						padding: "8px 10px",
 						fontSize: 13,
 						fontFamily: "monospace",
-						backgroundColor: "#16161e",
-						color: "#ccc",
-						border: "1px solid #2a2a35",
+						backgroundColor: theme.bgInput,
+						color: theme.text,
+						border: `1px solid ${theme.border}`,
 						borderRadius: 4,
 						resize: "vertical",
 					}}
@@ -98,12 +100,12 @@ function Overview({
 			</label>
 			{ticket.sourceUrl && (
 				<div>
-					<span style={{ fontSize: 12, color: "#888" }}>ソース: </span>
+					<span style={{ fontSize: 12, color: theme.textMuted }}>ソース: </span>
 					<a
 						href={ticket.sourceUrl}
 						target="_blank"
 						rel="noopener noreferrer"
-						style={{ fontSize: 12, color: "#6c8ebf" }}
+						style={{ fontSize: 12, color: theme.link }}
 					>
 						{ticket.sourceUrl}
 					</a>
@@ -122,6 +124,7 @@ export function TicketDetail({
 	onApply,
 	onRevert,
 }: Props) {
+	const { theme } = useTheme();
 	const [tab, setTab] = useState<DetailTab>("overview");
 	const [widthPercent, setWidthPercent] = useState(60);
 	const dragging = useRef(false);
@@ -177,7 +180,7 @@ export function TicketDetail({
 		border: "none",
 		borderBottom: tab === key ? `2px solid ${color}` : "2px solid transparent",
 		backgroundColor: "transparent",
-		color: tab === key ? "#ccc" : "#666",
+		color: tab === key ? theme.text : theme.textDim,
 		cursor: "pointer",
 	});
 
@@ -194,8 +197,8 @@ export function TicketDetail({
 				zIndex: 50,
 				display: "flex",
 				flexDirection: "row",
-				backgroundColor: "#121218",
-				boxShadow: "-4px 0 24px rgba(0,0,0,0.5)",
+				backgroundColor: theme.bg,
+				boxShadow: `-4px 0 24px ${theme.shadow}`,
 			}}
 		>
 			{/* biome-ignore lint/a11y/noStaticElementInteractions: drag resize handle */}
@@ -216,7 +219,7 @@ export function TicketDetail({
 						top: 0,
 						bottom: 0,
 						width: 1,
-						backgroundColor: "#2a2a35",
+						backgroundColor: theme.border,
 					}}
 				/>
 			</div>
@@ -233,7 +236,7 @@ export function TicketDetail({
 						display: "flex",
 						alignItems: "center",
 						padding: "0 12px",
-						borderBottom: "1px solid #2a2a35",
+						borderBottom: `1px solid ${theme.border}`,
 						flexShrink: 0,
 						gap: 8,
 					}}
@@ -243,7 +246,7 @@ export function TicketDetail({
 							flex: 1,
 							fontSize: 13,
 							fontWeight: 600,
-							color: "#ccc",
+							color: theme.text,
 							overflow: "hidden",
 							textOverflow: "ellipsis",
 							whiteSpace: "nowrap",
@@ -261,8 +264,8 @@ export function TicketDetail({
 									padding: "4px 10px",
 									fontSize: 11,
 									backgroundColor: "transparent",
-									color: "#43a047",
-									border: "1px solid #2e7d32",
+									color: theme.green,
+									border: `1px solid ${theme.greenBorder}`,
 									borderRadius: 4,
 									cursor: "pointer",
 									whiteSpace: "nowrap",
@@ -277,8 +280,8 @@ export function TicketDetail({
 									padding: "4px 10px",
 									fontSize: 11,
 									backgroundColor: "transparent",
-									color: "#c68a1a",
-									border: "1px solid #3d3520",
+									color: theme.yellow,
+									border: `1px solid ${theme.yellowBorder}`,
 									borderRadius: 4,
 									cursor: "pointer",
 									whiteSpace: "nowrap",
@@ -292,7 +295,7 @@ export function TicketDetail({
 								style={{
 									padding: "4px 10px",
 									fontSize: 11,
-									backgroundColor: "#2563eb",
+									backgroundColor: theme.accent,
 									color: "#fff",
 									border: "none",
 									borderRadius: 4,
@@ -310,7 +313,7 @@ export function TicketDetail({
 						style={{
 							all: "unset",
 							fontSize: 16,
-							color: "#666",
+							color: theme.textDim,
 							cursor: "pointer",
 							padding: "8px",
 						}}
@@ -321,14 +324,14 @@ export function TicketDetail({
 				<div
 					style={{
 						display: "flex",
-						borderBottom: "1px solid #2a2a35",
+						borderBottom: `1px solid ${theme.border}`,
 						flexShrink: 0,
 					}}
 				>
 					<button
 						type="button"
 						onClick={() => setTab("overview")}
-						style={tabStyle("overview", "#bbb")}
+						style={tabStyle("overview", theme.textLabel)}
 					>
 						概要
 					</button>
@@ -336,7 +339,7 @@ export function TicketDetail({
 						<button
 							type="button"
 							onClick={() => setTab("terminal")}
-							style={tabStyle("terminal", "#43a047")}
+							style={tabStyle("terminal", theme.green)}
 						>
 							Terminal
 						</button>
@@ -345,7 +348,7 @@ export function TicketDetail({
 						<button
 							type="button"
 							onClick={() => setTab("diff")}
-							style={tabStyle("diff", "#58a6ff")}
+							style={tabStyle("diff", theme.blue)}
 						>
 							Diff
 						</button>
@@ -364,7 +367,7 @@ export function TicketDetail({
 					) : tab === "diff" && hasDiff ? (
 						<DiffView ticketId={ticket.id} />
 					) : (
-						<div style={{ padding: 24, color: "#555", fontSize: 13 }}>
+						<div style={{ padding: 24, color: theme.textDim, fontSize: 13 }}>
 							情報がありません
 						</div>
 					)}

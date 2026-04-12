@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTheme } from "../lib/ThemeContext";
 import type { Directory } from "../types/directory";
 import type { Status, Ticket, TicketDependency } from "../types/ticket";
 import { KanbanBoard } from "./KanbanBoard";
@@ -13,6 +14,7 @@ type ActiveSession = {
 };
 
 export function TodoApp() {
+	const { theme } = useTheme();
 	const [tickets, setTickets] = useState<Ticket[]>([]);
 	const [dependencies, setDependencies] = useState<TicketDependency[]>([]);
 	const [directories, setDirectories] = useState<Directory[]>([]);
@@ -322,7 +324,7 @@ export function TodoApp() {
 						display: "flex",
 						gap: 0,
 						marginBottom: 16,
-						borderBottom: "1px solid #2a2a35",
+						borderBottom: `1px solid ${theme.border}`,
 					}}
 				>
 					<button
@@ -334,10 +336,10 @@ export function TodoApp() {
 							border: "none",
 							borderBottom:
 								filterDirId === null
-									? "2px solid #2563eb"
+									? `2px solid ${theme.accent}`
 									: "2px solid transparent",
 							backgroundColor: "transparent",
-							color: filterDirId === null ? "#ccc" : "#666",
+							color: filterDirId === null ? theme.text : theme.textDim,
 							cursor: "pointer",
 						}}
 					>
@@ -354,15 +356,17 @@ export function TodoApp() {
 								border: "none",
 								borderBottom:
 									filterDirId === d.id
-										? "2px solid #2563eb"
+										? `2px solid ${theme.accent}`
 										: "2px solid transparent",
 								backgroundColor: "transparent",
-								color: filterDirId === d.id ? "#ccc" : "#666",
+								color: filterDirId === d.id ? theme.text : theme.textDim,
 								cursor: "pointer",
 							}}
 						>
 							{d.name}
-							<span style={{ marginLeft: 4, fontSize: 10, color: "#555" }}>
+							<span
+								style={{ marginLeft: 4, fontSize: 10, color: theme.textDim }}
+							>
 								{tickets.filter((t) => t.workDirectoryId === d.id).length}
 							</span>
 						</button>

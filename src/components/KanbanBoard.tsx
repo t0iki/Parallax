@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "../lib/ThemeContext";
 import type { Directory } from "../types/directory";
 import {
 	STATUS_LABELS,
@@ -26,14 +27,6 @@ type Props = {
 	>;
 };
 
-const COLUMN_COLORS: Record<
-	Status,
-	{ bg: string; border: string; badge: string }
-> = {
-	todo: { bg: "#1c1c28", border: "#2a2a35", badge: "#6c757d" },
-	in_progress: { bg: "#1f1c14", border: "#3d3520", badge: "#c68a1a" },
-};
-
 const menuItemStyle: React.CSSProperties = {
 	all: "unset",
 	padding: "6px 10px",
@@ -59,6 +52,7 @@ function TicketMenu({
 	onResetToTodo: (id: string) => void;
 	onDelete: (id: string) => void;
 }) {
+	const { theme } = useTheme();
 	const btnRef = useRef<HTMLButtonElement>(null);
 	const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
 
@@ -88,7 +82,7 @@ function TicketMenu({
 					cursor: "pointer",
 					padding: "2px 4px",
 					fontSize: 14,
-					color: "#666",
+					color: theme.textDim,
 					lineHeight: 1,
 				}}
 			>
@@ -100,15 +94,15 @@ function TicketMenu({
 						position: "fixed",
 						top: pos.top,
 						left: pos.left,
-						backgroundColor: "#1e1e2e",
-						border: "1px solid #2a2a35",
+						backgroundColor: theme.bgCard,
+						border: `1px solid ${theme.border}`,
 						borderRadius: 6,
 						padding: 4,
 						zIndex: 100,
 						minWidth: 120,
 						display: "flex",
 						flexDirection: "column",
-						boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+						boxShadow: `0 4px 12px ${theme.shadow}`,
 					}}
 				>
 					<button
@@ -118,9 +112,9 @@ function TicketMenu({
 							onToggleMenu("");
 							onDecompose(ticketId);
 						}}
-						style={{ ...menuItemStyle, color: "#58a6ff" }}
+						style={{ ...menuItemStyle, color: theme.blue }}
 						onMouseEnter={(e) => {
-							(e.target as HTMLElement).style.backgroundColor = "#2a2a40";
+							(e.target as HTMLElement).style.backgroundColor = theme.bgHover;
 						}}
 						onMouseLeave={(e) => {
 							(e.target as HTMLElement).style.backgroundColor = "transparent";
@@ -136,9 +130,9 @@ function TicketMenu({
 								onToggleMenu("");
 								onResetToTodo(ticketId);
 							}}
-							style={{ ...menuItemStyle, color: "#c68a1a" }}
+							style={{ ...menuItemStyle, color: theme.yellow }}
 							onMouseEnter={(e) => {
-								(e.target as HTMLElement).style.backgroundColor = "#2a2a40";
+								(e.target as HTMLElement).style.backgroundColor = theme.bgHover;
 							}}
 							onMouseLeave={(e) => {
 								(e.target as HTMLElement).style.backgroundColor = "transparent";
@@ -154,9 +148,9 @@ function TicketMenu({
 							onToggleMenu("");
 							onDelete(ticketId);
 						}}
-						style={{ ...menuItemStyle, color: "#f85149" }}
+						style={{ ...menuItemStyle, color: theme.red }}
 						onMouseEnter={(e) => {
-							(e.target as HTMLElement).style.backgroundColor = "#2a2a40";
+							(e.target as HTMLElement).style.backgroundColor = theme.bgHover;
 						}}
 						onMouseLeave={(e) => {
 							(e.target as HTMLElement).style.backgroundColor = "transparent";
@@ -199,6 +193,7 @@ function TicketCard({
 	onToggleMenu: (ticketId: string) => void;
 	onClick: () => void;
 }) {
+	const { theme } = useTheme();
 	return (
 		<li
 			draggable
@@ -207,10 +202,12 @@ function TicketCard({
 			onKeyDown={(e) => e.key === "Enter" && onClick()}
 			style={{
 				padding: "10px 12px",
-				backgroundColor: isSelected ? "#252540" : "#1e1e2e",
+				backgroundColor: isSelected ? theme.bgHover : theme.bgCard,
 				borderRadius: 6,
-				border: isSelected ? "1px solid #3a3a60" : "1px solid #2a2a35",
-				boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+				border: isSelected
+					? `1px solid ${theme.borderActive}`
+					: `1px solid ${theme.border}`,
+				boxShadow: `0 1px 3px ${theme.shadow}`,
 				cursor: "grab",
 				display: "flex",
 				flexDirection: "column",
@@ -239,7 +236,7 @@ function TicketCard({
 					style={{
 						fontSize: 14,
 						wordBreak: "break-word",
-						color: "#ddd",
+						color: theme.text,
 						flex: 1,
 					}}
 				>
@@ -263,8 +260,8 @@ function TicketCard({
 							padding: "2px 6px",
 							fontSize: 11,
 							backgroundColor: "transparent",
-							color: "#43a047",
-							border: "1px solid #2e7d32",
+							color: theme.green,
+							border: `1px solid ${theme.greenBorder}`,
 							borderRadius: 4,
 							cursor: "pointer",
 						}}
@@ -279,7 +276,7 @@ function TicketCard({
 							onClick={(e) => e.stopPropagation()}
 							style={{
 								fontSize: 11,
-								color: "#6c8ebf",
+								color: theme.link,
 								textDecoration: "none",
 							}}
 						>
@@ -287,7 +284,9 @@ function TicketCard({
 						</a>
 					)}
 					{childCount > 0 && (
-						<span style={{ fontSize: 11, color: "#888" }}>{childCount}件</span>
+						<span style={{ fontSize: 11, color: theme.textMuted }}>
+							{childCount}件
+						</span>
 					)}
 					<TicketMenu
 						menuOpen={menuOpen}
@@ -304,7 +303,7 @@ function TicketCard({
 				<div
 					style={{
 						fontSize: 11,
-						color: "#58a6ff",
+						color: theme.blue,
 						display: "flex",
 						alignItems: "center",
 						gap: 4,
@@ -317,7 +316,7 @@ function TicketCard({
 							height: 6,
 							borderRadius: "50%",
 							backgroundColor:
-								ticket.startPhase === "error" ? "#f85149" : "#58a6ff",
+								ticket.startPhase === "error" ? theme.red : theme.blue,
 							animation:
 								ticket.startPhase === "error" ? "none" : "pulse 1.5s infinite",
 						}}
@@ -333,10 +332,10 @@ function TicketCard({
 					style={{
 						fontSize: 10,
 						padding: "1px 6px",
-						backgroundColor: "#2a2a40",
-						color: "#8b9dc3",
+						backgroundColor: theme.tagBg,
+						color: theme.tag,
 						borderRadius: 3,
-						border: "1px solid #3a3a50",
+						border: `1px solid ${theme.tagBorder}`,
 						alignSelf: "flex-start",
 					}}
 				>
@@ -344,7 +343,7 @@ function TicketCard({
 				</span>
 			)}
 			{blockedByNames.length > 0 && (
-				<div style={{ fontSize: 11, color: "#c68a1a" }}>
+				<div style={{ fontSize: 11, color: theme.yellow }}>
 					待ち: {blockedByNames.join(", ")}
 				</div>
 			)}
@@ -361,14 +360,15 @@ function SubTicketCard({
 	blockedByNames: string[];
 	onDelete: (id: string) => void;
 }) {
+	const { theme } = useTheme();
 	return (
 		<li
 			style={{
 				padding: "6px 10px",
 				marginLeft: 12,
-				backgroundColor: "#1a1a28",
+				backgroundColor: theme.bgInput,
 				borderRadius: 4,
-				borderLeft: "2px solid #2a2a35",
+				borderLeft: `2px solid ${theme.border}`,
 				display: "flex",
 				flexDirection: "column",
 				gap: 4,
@@ -385,7 +385,7 @@ function SubTicketCard({
 				<span
 					style={{
 						fontSize: 13,
-						color: "#bbb",
+						color: theme.textLabel,
 						wordBreak: "break-word",
 						flex: 1,
 					}}
@@ -399,8 +399,8 @@ function SubTicketCard({
 						padding: "1px 5px",
 						fontSize: 10,
 						backgroundColor: "transparent",
-						color: "#555",
-						border: "1px solid #2a2a35",
+						color: theme.textDim,
+						border: `1px solid ${theme.border}`,
 						borderRadius: 3,
 						cursor: "pointer",
 						flexShrink: 0,
@@ -410,7 +410,7 @@ function SubTicketCard({
 				</button>
 			</div>
 			{blockedByNames.length > 0 && (
-				<div style={{ fontSize: 10, color: "#c68a1a" }}>
+				<div style={{ fontSize: 10, color: theme.yellow }}>
 					待ち: {blockedByNames.join(", ")}
 				</div>
 			)}
@@ -419,6 +419,7 @@ function SubTicketCard({
 }
 
 function ColumnInput({ onAdd }: { onAdd: (title: string) => void }) {
+	const { theme } = useTheme();
 	const [title, setTitle] = useState("");
 
 	const handleSubmit = (e: React.FormEvent) => {
@@ -441,10 +442,10 @@ function ColumnInput({ onAdd }: { onAdd: (title: string) => void }) {
 						flex: 1,
 						padding: "6px 8px",
 						fontSize: 13,
-						border: "1px solid #2a2a35",
+						border: `1px solid ${theme.border}`,
 						borderRadius: 4,
-						backgroundColor: "#16161e",
-						color: "#ccc",
+						backgroundColor: theme.bgInput,
+						color: theme.text,
 					}}
 				/>
 				<button
@@ -452,7 +453,7 @@ function ColumnInput({ onAdd }: { onAdd: (title: string) => void }) {
 					style={{
 						padding: "6px 10px",
 						fontSize: 13,
-						backgroundColor: "#2563eb",
+						backgroundColor: theme.accent,
 						color: "#fff",
 						border: "none",
 						borderRadius: 4,
@@ -481,6 +482,11 @@ export function KanbanBoard({
 	selectedTicketId,
 	sessionStatuses,
 }: Props) {
+	const { theme } = useTheme();
+	const columnColors = {
+		todo: theme.columnTodo,
+		in_progress: theme.columnInProgress,
+	};
 	const dirMap = new Map(directories.map((d) => [d.id, d.name]));
 	const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
@@ -516,7 +522,7 @@ export function KanbanBoard({
 	return (
 		<div style={{ display: "flex", gap: 12, overflowX: "auto", flex: 1 }}>
 			{STATUSES.map((status) => {
-				const colors = COLUMN_COLORS[status];
+				const colors = columnColors[status];
 				const columnTickets = tickets.filter(
 					(t) => t.status === status && !t.parentId,
 				);
@@ -542,7 +548,13 @@ export function KanbanBoard({
 								borderBottom: `1px solid ${colors.border}`,
 							}}
 						>
-							<span style={{ fontWeight: 600, fontSize: 14, color: "#bbb" }}>
+							<span
+								style={{
+									fontWeight: 600,
+									fontSize: 14,
+									color: theme.textLabel,
+								}}
+							>
 								{STATUS_LABELS[status]}
 							</span>
 							<span

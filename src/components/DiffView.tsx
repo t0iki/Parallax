@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { type DiffHunk, parseDiff } from "../lib/diffParser";
+import { useTheme } from "../lib/ThemeContext";
 
 type DiffFile = { status: string; path: string };
 
@@ -38,12 +39,6 @@ function buildTree(files: DiffFile[]): TreeNode[] {
 	return root;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-	M: "#c68a1a",
-	A: "#43a047",
-	D: "#f85149",
-};
-
 function FileTree({
 	nodes,
 	depth,
@@ -55,6 +50,12 @@ function FileTree({
 	selectedPath: string | null;
 	onSelect: (path: string) => void;
 }) {
+	const { theme } = useTheme();
+	const statusColors: Record<string, string> = {
+		M: theme.yellow,
+		A: theme.green,
+		D: theme.red,
+	};
 	return (
 		<>
 			{nodes.map((node) => (
@@ -72,9 +73,12 @@ function FileTree({
 								padding: "3px 8px",
 								paddingLeft: depth * 16 + 8,
 								fontSize: 12,
-								color: selectedPath === node.fullPath ? "#ddd" : "#aaa",
+								color:
+									selectedPath === node.fullPath ? theme.text : theme.textLabel,
 								backgroundColor:
-									selectedPath === node.fullPath ? "#2a2a40" : "transparent",
+									selectedPath === node.fullPath
+										? theme.bgHover
+										: "transparent",
 								borderRadius: 3,
 								cursor: "pointer",
 								boxSizing: "border-box",
@@ -84,7 +88,7 @@ function FileTree({
 								style={{
 									fontSize: 10,
 									fontWeight: 600,
-									color: STATUS_COLORS[node.status ?? ""] ?? "#888",
+									color: statusColors[node.status ?? ""] ?? theme.textMuted,
 									minWidth: 12,
 								}}
 							>
@@ -98,7 +102,7 @@ function FileTree({
 								padding: "3px 8px",
 								paddingLeft: depth * 16 + 8,
 								fontSize: 12,
-								color: "#777",
+								color: theme.textDim,
 								fontWeight: 600,
 							}}
 						>
@@ -187,6 +191,7 @@ function DiffContent({ hunks }: { hunks: DiffHunk[] }) {
 }
 
 export function DiffView({ ticketId }: { ticketId: string }) {
+	const { theme } = useTheme();
 	const [files, setFiles] = useState<DiffFile[]>([]);
 	const [selectedFile, setSelectedFile] = useState<string | null>(null);
 	const [hunks, setHunks] = useState<DiffHunk[]>([]);
@@ -230,13 +235,13 @@ export function DiffView({ ticketId }: { ticketId: string }) {
 
 	if (error) {
 		return (
-			<div style={{ padding: 24, color: "#f85149", fontSize: 13 }}>{error}</div>
+			<div style={{ padding: 24, color: theme.red, fontSize: 13 }}>{error}</div>
 		);
 	}
 
 	if (files.length === 0 && !loading) {
 		return (
-			<div style={{ padding: 24, color: "#555", fontSize: 13 }}>
+			<div style={{ padding: 24, color: theme.textDim, fontSize: 13 }}>
 				変更されたファイルはありません
 			</div>
 		);
@@ -250,7 +255,7 @@ export function DiffView({ ticketId }: { ticketId: string }) {
 				style={{
 					width: 240,
 					flexShrink: 0,
-					borderRight: "1px solid #2a2a35",
+					borderRight: `1px solid ${theme.border}`,
 					overflow: "auto",
 					padding: "8px 0",
 				}}
@@ -263,7 +268,7 @@ export function DiffView({ ticketId }: { ticketId: string }) {
 						padding: "4px 12px 8px",
 					}}
 				>
-					<span style={{ fontSize: 12, color: "#888" }}>
+					<span style={{ fontSize: 12, color: theme.textMuted }}>
 						{files.length} files
 					</span>
 					<button
@@ -272,7 +277,7 @@ export function DiffView({ ticketId }: { ticketId: string }) {
 						style={{
 							all: "unset",
 							fontSize: 11,
-							color: "#58a6ff",
+							color: theme.blue,
 							cursor: "pointer",
 						}}
 					>
@@ -288,13 +293,13 @@ export function DiffView({ ticketId }: { ticketId: string }) {
 			</div>
 			<div style={{ flex: 1, overflow: "auto" }}>
 				{loading ? (
-					<div style={{ padding: 24, color: "#888", fontSize: 13 }}>
+					<div style={{ padding: 24, color: theme.textMuted, fontSize: 13 }}>
 						Loading...
 					</div>
 				) : selectedFile ? (
 					<DiffContent hunks={hunks} />
 				) : (
-					<div style={{ padding: 24, color: "#555", fontSize: 13 }}>
+					<div style={{ padding: 24, color: theme.textDim, fontSize: 13 }}>
 						ファイルを選択してください
 					</div>
 				)}
