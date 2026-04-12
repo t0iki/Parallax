@@ -6,7 +6,6 @@ import { handleDirectories } from "./routes/directories.js";
 import { handleSessions } from "./routes/sessions.js";
 import { handleTickets } from "./routes/tickets.js";
 import { tmuxSessionExists } from "./services/tmux.js";
-import { startWatchdog } from "./services/watchdog.js";
 
 const PORT = 3001;
 const SESSION_NAME = "plx-main";
@@ -152,5 +151,4 @@ wss.on("error", (err) => {
 
 server.listen(PORT, () => {
 	console.log(`Server listening on http://localhost:${PORT}`);
-	startWatchdog();
 });
