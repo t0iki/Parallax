@@ -4,9 +4,9 @@ Browser-based task management with Claude Code integration. Run multiple Claude 
 
 ## Prerequisites
 
-- Node.js v22.5+ (`node:sqlite`)
-- pnpm
-- tmux
+- [Homebrew](https://brew.sh)
+
+Everything else (mise, Node.js, pnpm, tmux) is installed automatically by `make setup`.
 
 ## Setup
 
