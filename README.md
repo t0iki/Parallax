@@ -11,9 +11,10 @@ Browser-based task management with Claude Code integration. Run multiple Claude 
 ## Setup
 
 ```bash
-pnpm install
-pnpm link --global  # makes `zanki` command available globally
+make setup
 ```
+
+Installs missing prerequisites (Node.js, pnpm, tmux) via Homebrew, runs `pnpm install`, and links the `zanki` command globally.
 
 ## Usage
 
