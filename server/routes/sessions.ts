@@ -22,26 +22,32 @@ function detectSessionStatus(
 			.toString()
 			.trim();
 
+		const lastLine = output.split("\n").pop() ?? "";
+		const prev = lastOutputMap.get(sessionName);
+		const now = Date.now();
+		let result: "idle" | "working" | "error";
+
 		if (
 			output.includes("Unable to connect") ||
 			output.includes("ConnectionRefused")
 		) {
-			return "error";
+			result = "error";
+		} else if (prev?.hash === output) {
+			const elapsed = Math.round((now - prev.updatedAt) / 1000);
+			result = now - prev.updatedAt > IDLE_THRESHOLD_MS ? "idle" : "working";
+			console.log(
+				`[session] ${sessionName}: ${result} (unchanged ${elapsed}s) last: "${lastLine.slice(0, 80)}"`,
+			);
+			return result;
+		} else {
+			lastOutputMap.set(sessionName, { hash: output, updatedAt: now });
+			result = "working";
 		}
 
-		// 出力が変化したかチェック
-		const prev = lastOutputMap.get(sessionName);
-		const now = Date.now();
-		if (prev?.hash === output) {
-			// 出力が変わっていない → 経過時間をチェック
-			if (now - prev.updatedAt > IDLE_THRESHOLD_MS) {
-				return "idle";
-			}
-		} else {
-			// 出力が変化した → 更新時刻をリセット
-			lastOutputMap.set(sessionName, { hash: output, updatedAt: now });
-		}
-		return "working";
+		console.log(
+			`[session] ${sessionName}: ${result} last: "${lastLine.slice(0, 80)}"`,
+		);
+		return result;
 	} catch {
 		return "working";
 	}
