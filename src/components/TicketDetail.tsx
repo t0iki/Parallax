@@ -48,11 +48,13 @@ function Overview({
 		<div
 			style={{
 				padding: 20,
+				paddingBottom: 24,
 				display: "flex",
 				flexDirection: "column",
 				gap: 16,
 				height: "100%",
 				overflow: "auto",
+				boxSizing: "border-box",
 			}}
 		>
 			<label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
