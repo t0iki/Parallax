@@ -143,9 +143,10 @@ export async function handleTickets(
 			);
 			// サブタスクのステータスも親に連動
 			if (body.status !== undefined) {
-				db.prepare(
-					"UPDATE tickets SET status = ? WHERE parent_id = ?",
-				).run(body.status, id);
+				db.prepare("UPDATE tickets SET status = ? WHERE parent_id = ?").run(
+					body.status,
+					id,
+				);
 			}
 		}
 		json(res, 200, { id, ...body });

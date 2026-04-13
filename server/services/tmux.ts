@@ -18,9 +18,22 @@ export function tmuxKillSession(sessionName: string): void {
 }
 
 export function tmuxSendKeys(sessionName: string, text: string): void {
-	execSync(
-		`tmux send-keys -t "${sessionName}" '${text.replace(/'/g, "'\\''")}' Enter`,
-	);
+	// 長いテキストはファイル経由で送る（tmux send-keysの文字数制限回避）
+	if (text.length > 200) {
+		const fs = require("node:fs");
+		const os = require("node:os");
+		const path = require("node:path");
+		const tmpFile = path.join(os.tmpdir(), `plx-sendkeys-${Date.now()}.txt`);
+		fs.writeFileSync(tmpFile, text);
+		execSync(
+			`tmux load-buffer "${tmpFile}" \\; paste-buffer -t "${sessionName}" \\; send-keys -t "${sessionName}" Enter`,
+		);
+		fs.unlinkSync(tmpFile);
+	} else {
+		execSync(
+			`tmux send-keys -t "${sessionName}" '${text.replace(/'/g, "'\\''")}' Enter`,
+		);
+	}
 }
 
 export function tmuxListTicketSessions(): string[] {
