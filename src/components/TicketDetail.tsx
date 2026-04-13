@@ -20,6 +20,164 @@ type Props = {
 	onStart: (ticketId: string) => void;
 };
 
+function DetailMenu({
+	ticketId,
+	hasSession,
+	onApply,
+	onRevert,
+	onCreatePR,
+}: {
+	ticketId: string;
+	hasSession: boolean;
+	onApply: (id: string) => void;
+	onRevert: (id: string) => void;
+	onCreatePR: (id: string) => void;
+}) {
+	const { theme } = useTheme();
+	const [open, setOpen] = useState(false);
+	const btnRef = useRef<HTMLButtonElement>(null);
+	const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+
+	useEffect(() => {
+		if (open && btnRef.current) {
+			const rect = btnRef.current.getBoundingClientRect();
+			setPos({ top: rect.bottom + 4, left: rect.right - 160 });
+		}
+	}, [open]);
+
+	useEffect(() => {
+		if (!open) return;
+		const close = () => setOpen(false);
+		document.addEventListener("click", close);
+		return () => document.removeEventListener("click", close);
+	}, [open]);
+
+	const itemStyle: React.CSSProperties = {
+		all: "unset",
+		padding: "6px 10px",
+		fontSize: 12,
+		cursor: "pointer",
+		borderRadius: 4,
+		color: theme.text,
+	};
+
+	return (
+		<>
+			<button
+				ref={btnRef}
+				type="button"
+				onClick={(e) => {
+					e.stopPropagation();
+					setOpen(!open);
+				}}
+				style={{
+					all: "unset",
+					cursor: "pointer",
+					padding: "4px 6px",
+					fontSize: 16,
+					color: theme.textMuted,
+					lineHeight: 1,
+				}}
+			>
+				⋯
+			</button>
+			{open && pos && (
+				<div
+					style={{
+						position: "fixed",
+						top: pos.top,
+						left: pos.left,
+						backgroundColor: theme.bgCard,
+						border: `1px solid ${theme.border}`,
+						borderRadius: 6,
+						padding: 4,
+						zIndex: 100,
+						minWidth: 160,
+						display: "flex",
+						flexDirection: "column",
+						boxShadow: `0 4px 12px ${theme.shadow}`,
+					}}
+				>
+					<button
+						type="button"
+						onClick={() => {
+							navigator.clipboard.writeText(`/tmp/plx-ticket-${ticketId}.md`);
+							setOpen(false);
+						}}
+						style={itemStyle}
+						onMouseEnter={(e) => {
+							(e.target as HTMLElement).style.backgroundColor = theme.bgHover;
+						}}
+						onMouseLeave={(e) => {
+							(e.target as HTMLElement).style.backgroundColor = "transparent";
+						}}
+					>
+						プロンプトパスをコピー
+					</button>
+					{hasSession && (
+						<>
+							<button
+								type="button"
+								onClick={() => {
+									onApply(ticketId);
+									setOpen(false);
+								}}
+								style={{ ...itemStyle, color: theme.green }}
+								onMouseEnter={(e) => {
+									(e.target as HTMLElement).style.backgroundColor =
+										theme.bgHover;
+								}}
+								onMouseLeave={(e) => {
+									(e.target as HTMLElement).style.backgroundColor =
+										"transparent";
+								}}
+							>
+								反映
+							</button>
+							<button
+								type="button"
+								onClick={() => {
+									onRevert(ticketId);
+									setOpen(false);
+								}}
+								style={{ ...itemStyle, color: theme.yellow }}
+								onMouseEnter={(e) => {
+									(e.target as HTMLElement).style.backgroundColor =
+										theme.bgHover;
+								}}
+								onMouseLeave={(e) => {
+									(e.target as HTMLElement).style.backgroundColor =
+										"transparent";
+								}}
+							>
+								元に戻す
+							</button>
+							<button
+								type="button"
+								onClick={() => {
+									onCreatePR(ticketId);
+									setOpen(false);
+								}}
+								style={{ ...itemStyle, color: theme.accent }}
+								onMouseEnter={(e) => {
+									(e.target as HTMLElement).style.backgroundColor =
+										theme.bgHover;
+								}}
+								onMouseLeave={(e) => {
+									(e.target as HTMLElement).style.backgroundColor =
+										"transparent";
+								}}
+							>
+								PR作成
+							</button>
+						</>
+					)}
+				</div>
+			)}
+		</>
+	);
+}
+
 function Overview({
 	ticket,
 	onUpdate,
@@ -262,58 +420,13 @@ export function TicketDetail({
 					>
 						{ticket.title}
 					</span>
-					{session && (
-						<>
-							<button
-								type="button"
-								onClick={() => onApply(ticket.id)}
-								style={{
-									padding: "4px 10px",
-									fontSize: 11,
-									backgroundColor: "transparent",
-									color: theme.green,
-									border: `1px solid ${theme.greenBorder}`,
-									borderRadius: 4,
-									cursor: "pointer",
-									whiteSpace: "nowrap",
-								}}
-							>
-								反映
-							</button>
-							<button
-								type="button"
-								onClick={() => onRevert(ticket.id)}
-								style={{
-									padding: "4px 10px",
-									fontSize: 11,
-									backgroundColor: "transparent",
-									color: theme.yellow,
-									border: `1px solid ${theme.yellowBorder}`,
-									borderRadius: 4,
-									cursor: "pointer",
-									whiteSpace: "nowrap",
-								}}
-							>
-								元に戻す
-							</button>
-							<button
-								type="button"
-								onClick={() => onCreatePR(ticket.id)}
-								style={{
-									padding: "4px 10px",
-									fontSize: 11,
-									backgroundColor: theme.accent,
-									color: "#fff",
-									border: "none",
-									borderRadius: 4,
-									cursor: "pointer",
-									whiteSpace: "nowrap",
-								}}
-							>
-								PR作成
-							</button>
-						</>
-					)}
+					<DetailMenu
+						ticketId={ticket.id}
+						hasSession={!!session}
+						onApply={onApply}
+						onRevert={onRevert}
+						onCreatePR={onCreatePR}
+					/>
 					<button
 						type="button"
 						onClick={onClose}
