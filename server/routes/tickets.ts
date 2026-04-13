@@ -65,6 +65,11 @@ export async function handleTickets(
 			body.status,
 			body.createdAt,
 		);
+		// MDファイルを作成
+		fs.writeFileSync(
+			path.join(os.tmpdir(), `plx-ticket-${body.id}.md`),
+			`# ${body.title}\n\n${body.description ?? ""}`,
+		);
 		json(res, 201, body);
 		return true;
 	}
@@ -151,19 +156,17 @@ export async function handleTickets(
 				);
 			}
 		}
-		// title/description変更時にMDファイルも更新
+		// title/description変更時にMDファイルも更新（なければ作成）
 		if (body.title !== undefined || body.description !== undefined) {
 			const descFile = path.join(os.tmpdir(), `plx-ticket-${id}.md`);
-			if (fs.existsSync(descFile)) {
-				const ticket = db
-					.prepare("SELECT title, description FROM tickets WHERE id = ?")
-					.get(id) as { title: string; description: string } | undefined;
-				if (ticket) {
-					fs.writeFileSync(
-						descFile,
-						`# ${ticket.title}\n\n${ticket.description}`,
-					);
-				}
+			const ticket = db
+				.prepare("SELECT title, description FROM tickets WHERE id = ?")
+				.get(id) as { title: string; description: string } | undefined;
+			if (ticket) {
+				fs.writeFileSync(
+					descFile,
+					`# ${ticket.title}\n\n${ticket.description}`,
+				);
 			}
 		}
 
