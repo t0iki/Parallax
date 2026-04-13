@@ -156,8 +156,10 @@ export function TodoApp() {
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
 				text: `以下のworktreeの変更をメインディレクトリに反映してください。
-1. worktree "${ticket.worktreePath}" でbase_commit "${ticket.baseCommit}" からの差分をpatchファイルとして生成 (git diff ${ticket.baseCommit} > /tmp/plx-patch-${ticketId}.patch)
-2. メインディレクトリ "${dir.path}" でそのpatchを適用 (cd "${dir.path}" && git apply /tmp/plx-patch-${ticketId}.patch)
+1. worktree "${ticket.worktreePath}" に移動して、base_commit "${ticket.baseCommit}" からの差分をpatchファイルとして生成してください。worktreeはリポジトリのサブディレクトリにあるため、必ず --relative オプションを使ってください:
+   cd "${ticket.worktreePath}" && git diff --relative ${ticket.baseCommit} > /tmp/plx-patch-${ticketId}.patch
+2. メインディレクトリ "${dir.path}" でそのpatchを適用:
+   cd "${dir.path}" && git apply /tmp/plx-patch-${ticketId}.patch
 3. 適用したファイル一覧を表示してください`,
 			}),
 		});
