@@ -36,6 +36,7 @@ export function Terminal({
 			cursorBlink: true,
 			fontSize: 13,
 			fontFamily: '"Menlo", "DejaVu Sans Mono", "Consolas", monospace',
+			allowProposedApi: true,
 			theme: {
 				background: "#1a1a2e",
 				foreground: "#e0e0e0",
@@ -48,6 +49,12 @@ export function Terminal({
 		term.loadAddon(fitAddon);
 		term.open(container);
 		fitAddon.fit();
+
+		// 選択テキストを自動でクリップボードにコピー
+		term.onSelectionChange(() => {
+			const sel = term.getSelection();
+			if (sel) navigator.clipboard.writeText(sel);
+		});
 
 		const ws = new WebSocket(wsUrl);
 
