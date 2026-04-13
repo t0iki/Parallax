@@ -25,9 +25,9 @@ export function tmuxSendKeys(sessionName: string, text: string): void {
 		const path = require("node:path");
 		const tmpFile = path.join(os.tmpdir(), `plx-sendkeys-${Date.now()}.txt`);
 		fs.writeFileSync(tmpFile, text);
-		execSync(
-			`tmux load-buffer "${tmpFile}" \\; paste-buffer -t "${sessionName}" \\; send-keys -t "${sessionName}" Enter`,
-		);
+		execSync(`tmux load-buffer "${tmpFile}"`);
+		execSync(`tmux paste-buffer -t "${sessionName}"`);
+		execSync(`tmux send-keys -t "${sessionName}" Enter`);
 		fs.unlinkSync(tmpFile);
 	} else {
 		execSync(
