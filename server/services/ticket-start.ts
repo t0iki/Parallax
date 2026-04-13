@@ -133,47 +133,66 @@ export function startTicket(params: StartParams): StartResult | null {
 		| undefined;
 	if (!ticket) return null;
 
-	const dir = db
-		.prepare(
-			"SELECT path, main_branch, branch_template FROM directories WHERE id = ?",
-		)
-		.get(directoryId) as
-		| { path: string; main_branch: string; branch_template: string }
-		| undefined;
-	if (!dir) return null;
+	// ホームディレクトリの場合はworktreeなしで起動
+	const isHome = directoryId === "__home__";
+	const dir = isHome
+		? null
+		: (db
+				.prepare(
+					"SELECT path, main_branch, branch_template FROM directories WHERE id = ?",
+				)
+				.get(directoryId) as
+				| { path: string; main_branch: string; branch_template: string }
+				| undefined);
+	if (!isHome && !dir) return null;
 
-	const addDirPaths = getAddDirPaths(directoryId, addDirectoryIds);
+	const addDirPaths = isHome
+		? []
+		: getAddDirPaths(directoryId, addDirectoryIds);
 	const sessionName = `plx-ticket-${ticketId}`;
 
 	// Immediately update status
 	db.prepare(
 		"UPDATE tickets SET status = ?, start_phase = ?, work_directory_id = ? WHERE id = ?",
-	).run("in_progress", "creating_worktree", directoryId, ticketId);
+	).run(
+		"in_progress",
+		isHome ? "starting_claude" : "creating_worktree",
+		isHome ? null : directoryId,
+		ticketId,
+	);
 
 	// Background: worktree + Claude Code
 	const descFile = buildDescriptionFile(ticketId, ticket);
 
-	const branchName = (dir.branch_template || "{title}")
-		.replace("{title}", slugify(ticket.title))
-		.replace("{id}", ticketId.slice(0, 8));
-	const worktreeDir = path.join(dir.path, ".plx-worktrees", ticketId);
-
+	let effectiveCwd: string;
 	let worktreePath: string | null = null;
-	const baseCommit = getHeadCommit(dir.path, dir.main_branch);
+	let branchName: string | null = null;
+	let baseCommit: string | null = null;
 
-	try {
-		createWorktree({
-			repoPath: dir.path,
-			worktreeDir,
-			branchName,
-			baseBranch: dir.main_branch,
-		});
-		worktreePath = worktreeDir;
-	} catch (err) {
-		console.error("Failed to create worktree:", err);
+	if (isHome) {
+		effectiveCwd = os.homedir();
+	} else if (dir) {
+		branchName = (dir.branch_template || "{title}")
+			.replace("{title}", slugify(ticket.title))
+			.replace("{id}", ticketId.slice(0, 8));
+		const worktreeDir = path.join(dir.path, ".plx-worktrees", ticketId);
+		baseCommit = getHeadCommit(dir.path, dir.main_branch);
+
+		try {
+			createWorktree({
+				repoPath: dir.path,
+				worktreeDir,
+				branchName,
+				baseBranch: dir.main_branch,
+			});
+			worktreePath = worktreeDir;
+		} catch (err) {
+			console.error("Failed to create worktree:", err);
+		}
+		effectiveCwd = worktreePath ?? dir.path;
+	} else {
+		effectiveCwd = os.homedir();
 	}
-
-	const effectiveCwd = worktreePath ?? dir.path;
 
 	db.prepare(
 		"UPDATE tickets SET base_commit = ?, worktree_path = ?, branch_name = ?, start_phase = ? WHERE id = ?",

@@ -21,7 +21,10 @@ export function StartTicketDialog({
 	onCancel,
 }: Props) {
 	const { theme } = useTheme();
-	const [selectedDirId, setSelectedDirId] = useState(directories[0]?.id ?? "");
+	const HOME_ID = "__home__";
+	const [selectedDirId, setSelectedDirId] = useState(
+		directories[0]?.id ?? HOME_ID,
+	);
 	const [addDirIds, setAddDirIds] = useState<string[]>([]);
 
 	const toggleAddDir = (id: string) => {
@@ -30,7 +33,9 @@ export function StartTicketDialog({
 		);
 	};
 
-	const otherDirs = directories.filter((d) => d.id !== selectedDirId);
+	const otherDirs = directories.filter(
+		(d) => d.id !== selectedDirId && selectedDirId !== HOME_ID,
+	);
 
 	return (
 		/* biome-ignore lint/a11y/noStaticElementInteractions: modal overlay */
@@ -103,6 +108,7 @@ export function StartTicketDialog({
 								borderRadius: 4,
 							}}
 						>
+							<option value={HOME_ID}>Home — ~</option>
 							{directories.map((d) => (
 								<option key={d.id} value={d.id}>
 									{d.name} — {d.path}
