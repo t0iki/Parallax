@@ -23,12 +23,14 @@ type Props = {
 function DetailMenu({
 	ticketId,
 	hasSession,
+	worktreePath,
 	onApply,
 	onRevert,
 	onCreatePR,
 }: {
 	ticketId: string;
 	hasSession: boolean;
+	worktreePath: string | null;
 	onApply: (id: string) => void;
 	onRevert: (id: string) => void;
 	onCreatePR: (id: string) => void;
@@ -116,6 +118,28 @@ function DetailMenu({
 					>
 						プロンプトパスをコピー
 					</button>
+					{worktreePath && (
+						<button
+							type="button"
+							onClick={() => {
+								fetch("/api/open-in-cursor", {
+									method: "POST",
+									headers: { "Content-Type": "application/json" },
+									body: JSON.stringify({ path: worktreePath }),
+								});
+								setOpen(false);
+							}}
+							style={itemStyle}
+							onMouseEnter={(e) => {
+								(e.target as HTMLElement).style.backgroundColor = theme.bgHover;
+							}}
+							onMouseLeave={(e) => {
+								(e.target as HTMLElement).style.backgroundColor = "transparent";
+							}}
+						>
+							Cursorで開く
+						</button>
+					)}
 					{hasSession && (
 						<>
 							<button
@@ -447,6 +471,7 @@ export function TicketDetail({
 					<DetailMenu
 						ticketId={ticket.id}
 						hasSession={!!session}
+						worktreePath={ticket.worktreePath}
 						onApply={onApply}
 						onRevert={onRevert}
 						onCreatePR={onCreatePR}

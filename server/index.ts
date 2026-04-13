@@ -38,6 +38,22 @@ const server = http.createServer(async (req, res) => {
 	if (await handleDirectories(req, res, url)) return;
 	if (await handleSessions(req, res, url, PROJECT_DIR)) return;
 
+	// POST /api/open-in-cursor
+	if (req.method === "POST" && url.pathname === "/api/open-in-cursor") {
+		const { readBody, json: jsonRes } = await import("./utils.js");
+		const { execSync } = await import("node:child_process");
+		const body = JSON.parse(await readBody(req));
+		try {
+			execSync(`cursor "${body.path}"`);
+			jsonRes(res, 200, { ok: true });
+		} catch (err) {
+			jsonRes(res, 500, {
+				error: `Failed to open: ${err instanceof Error ? err.message : String(err)}`,
+			});
+		}
+		return;
+	}
+
 	res.writeHead(404);
 	res.end("Not Found");
 });
