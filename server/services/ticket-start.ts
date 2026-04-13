@@ -40,7 +40,7 @@ function buildDescriptionFile(
 	ticketId: string,
 	ticket: { title: string; description: string },
 ): string {
-	const descFile = path.join(os.tmpdir(), `plx-ticket-${ticketId}.md`);
+	const descFile = path.join("/tmp/plx", `plx-ticket-${ticketId}.md`);
 
 	const subtasks = db
 		.prepare(
@@ -101,7 +101,7 @@ function buildDescriptionFile(
 }
 
 function buildMcpConfig(ticketId: string): string {
-	const mcpConfigPath = path.join(os.tmpdir(), `plx-mcp-${ticketId}.json`);
+	const mcpConfigPath = path.join("/tmp/plx", `plx-mcp-${ticketId}.json`);
 	fs.writeFileSync(
 		mcpConfigPath,
 		JSON.stringify({

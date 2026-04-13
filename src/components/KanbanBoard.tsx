@@ -127,7 +127,7 @@ function TicketMenu({
 						onClick={(e) => {
 							e.stopPropagation();
 							onToggleMenu("");
-							const p = `/tmp/plx-ticket-${ticketId}.md`;
+							const p = `/tmp/plx/plx-ticket-${ticketId}.md`;
 							navigator.clipboard.writeText(p);
 						}}
 						style={{ ...menuItemStyle, color: theme.textLabel }}

@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
 import * as pty from "node-pty";
@@ -6,6 +7,8 @@ import { handleDirectories } from "./routes/directories.js";
 import { handleSessions } from "./routes/sessions.js";
 import { handleTickets } from "./routes/tickets.js";
 import { tmuxSessionExists } from "./services/tmux.js";
+
+fs.mkdirSync("/tmp/plx", { recursive: true });
 
 const PORT = 24510;
 const SESSION_NAME = "plx-main";

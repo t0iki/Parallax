@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import type http from "node:http";
-import os from "node:os";
 import path from "node:path";
 import db from "../db.js";
 import {
@@ -66,10 +65,9 @@ export async function handleTickets(
 			body.createdAt,
 		);
 		// MDファイルを作成
-		fs.writeFileSync(
-			path.join(os.tmpdir(), `plx-ticket-${body.id}.md`),
-			`# ${body.title}\n\n${body.description ?? ""}`,
-		);
+		const mdPath = path.join("/tmp/plx", `plx-ticket-${body.id}.md`);
+		fs.writeFileSync(mdPath, `# ${body.title}\n\n${body.description ?? ""}`);
+		console.log(`[ticket] Created MD: ${mdPath}`);
 		json(res, 201, body);
 		return true;
 	}
@@ -158,7 +156,7 @@ export async function handleTickets(
 		}
 		// title/description変更時にMDファイルも更新（なければ作成）
 		if (body.title !== undefined || body.description !== undefined) {
-			const descFile = path.join(os.tmpdir(), `plx-ticket-${id}.md`);
+			const descFile = path.join("/tmp/plx", `plx-ticket-${id}.md`);
 			const ticket = db
 				.prepare("SELECT title, description FROM tickets WHERE id = ?")
 				.get(id) as { title: string; description: string } | undefined;
@@ -167,7 +165,16 @@ export async function handleTickets(
 					descFile,
 					`# ${ticket.title}\n\n${ticket.description}`,
 				);
+				console.log(
+					`[ticket] Updated MD: ${descFile} (exists: ${fs.existsSync(descFile)})`,
+				);
+			} else {
+				console.log(`[ticket] PATCH: ticket ${id} not found in DB`);
 			}
+		} else {
+			console.log(
+				`[ticket] PATCH: no title/description in body, keys: ${Object.keys(body).join(",")}`,
+			);
 		}
 
 		json(res, 200, { id, ...body });

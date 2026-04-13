@@ -101,7 +101,9 @@ function DetailMenu({
 					<button
 						type="button"
 						onClick={() => {
-							navigator.clipboard.writeText(`/tmp/plx-ticket-${ticketId}.md`);
+							navigator.clipboard.writeText(
+								`/tmp/plx/plx-ticket-${ticketId}.md`,
+							);
 							setOpen(false);
 						}}
 						style={itemStyle}
