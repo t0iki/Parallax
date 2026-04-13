@@ -248,7 +248,15 @@ export function TodoApp() {
 		}
 
 		const ticket = tickets.find((t) => t.id === ticketId);
-		if (ticket) setStartingTicket(ticket);
+		if (!ticket) return;
+
+		// 作業中で未セットアップ（手動移動）の場合はホームで直接起動
+		if (ticket.status === "in_progress" && !ticket.workDirectoryId) {
+			handleConfirmStart(ticketId, "__home__", []);
+			return;
+		}
+
+		setStartingTicket(ticket);
 	};
 
 	const handleConfirmStart = async (

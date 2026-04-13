@@ -352,14 +352,14 @@ export function TicketDetail({
 								onClick={() => onStart(ticket.id)}
 								style={{
 									padding: "6px 14px",
-									fontSize: 12,
+									fontSize: 16,
 									border: "none",
 									backgroundColor: "transparent",
 									color: theme.green,
 									cursor: "pointer",
 								}}
 							>
-								▶ 起動
+								+
 							</button>
 						)
 					)}

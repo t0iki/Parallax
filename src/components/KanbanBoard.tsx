@@ -122,6 +122,24 @@ function TicketMenu({
 					>
 						タスク分解
 					</button>
+					<button
+						type="button"
+						onClick={(e) => {
+							e.stopPropagation();
+							onToggleMenu("");
+							const p = `/tmp/plx-ticket-${ticketId}.md`;
+							navigator.clipboard.writeText(p);
+						}}
+						style={{ ...menuItemStyle, color: theme.textLabel }}
+						onMouseEnter={(e) => {
+							(e.target as HTMLElement).style.backgroundColor = theme.bgHover;
+						}}
+						onMouseLeave={(e) => {
+							(e.target as HTMLElement).style.backgroundColor = "transparent";
+						}}
+					>
+						プロンプトパスをコピー
+					</button>
 					{isInProgress && (
 						<button
 							type="button"

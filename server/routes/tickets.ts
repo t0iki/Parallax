@@ -1,4 +1,6 @@
+import fs from "node:fs";
 import type http from "node:http";
+import os from "node:os";
 import path from "node:path";
 import db from "../db.js";
 import {
@@ -149,6 +151,22 @@ export async function handleTickets(
 				);
 			}
 		}
+		// title/description変更時にMDファイルも更新
+		if (body.title !== undefined || body.description !== undefined) {
+			const descFile = path.join(os.tmpdir(), `plx-ticket-${id}.md`);
+			if (fs.existsSync(descFile)) {
+				const ticket = db
+					.prepare("SELECT title, description FROM tickets WHERE id = ?")
+					.get(id) as { title: string; description: string } | undefined;
+				if (ticket) {
+					fs.writeFileSync(
+						descFile,
+						`# ${ticket.title}\n\n${ticket.description}`,
+					);
+				}
+			}
+		}
+
 		json(res, 200, { id, ...body });
 		return true;
 	}
