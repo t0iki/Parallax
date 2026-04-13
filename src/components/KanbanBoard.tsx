@@ -173,6 +173,9 @@ function TicketCard({
 	sessionStatus,
 	menuOpen,
 	onDelete,
+	hasChildren,
+	childrenExpanded,
+	onToggleChildren,
 	onStart,
 	onDecompose,
 	onResetToTodo,
@@ -185,6 +188,9 @@ function TicketCard({
 	isSelected: boolean;
 	directoryName: string | null;
 	sessionStatus: "idle" | "working" | "error" | null;
+	hasChildren: boolean;
+	childrenExpanded: boolean;
+	onToggleChildren: () => void;
 	menuOpen: boolean;
 	onDelete: (id: string) => void;
 	onStart: (ticketId: string) => void;
@@ -222,6 +228,28 @@ function TicketCard({
 					gap: 8,
 				}}
 			>
+				{hasChildren && (
+					<button
+						type="button"
+						onClick={(e) => {
+							e.stopPropagation();
+							onToggleChildren();
+						}}
+						style={{
+							all: "unset",
+							cursor: "pointer",
+							fontSize: 10,
+							color: theme.textMuted,
+							flexShrink: 0,
+							width: 14,
+							textAlign: "center",
+							transition: "transform 0.15s",
+							transform: childrenExpanded ? "rotate(90deg)" : "rotate(0deg)",
+						}}
+					>
+						▶
+					</button>
+				)}
 				{sessionStatus === "idle" && (
 					<span
 						title="停止中"
@@ -506,6 +534,17 @@ export function KanbanBoard({
 		in_progress: theme.columnInProgress,
 	};
 	const dirMap = new Map(directories.map((d) => [d.id, d.name]));
+	const [expandedTickets, setExpandedTickets] = useState<Set<string>>(
+		new Set(),
+	);
+	const toggleExpand = (ticketId: string) => {
+		setExpandedTickets((prev) => {
+			const next = new Set(prev);
+			if (next.has(ticketId)) next.delete(ticketId);
+			else next.add(ticketId);
+			return next;
+		});
+	};
 	const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
 	// 外側クリックでメニューを閉じる
@@ -628,6 +667,9 @@ export function KanbanBoard({
 											sessionStatus={
 												sessionStatuses.get(ticket.id)?.status ?? null
 											}
+											hasChildren={children.length > 0}
+											childrenExpanded={expandedTickets.has(ticket.id)}
+											onToggleChildren={() => toggleExpand(ticket.id)}
 											menuOpen={openMenuId === ticket.id}
 											onDelete={onDelete}
 											onStart={onStart}
@@ -638,14 +680,15 @@ export function KanbanBoard({
 											}
 											onClick={() => onTicketClick(ticket.id)}
 										/>
-										{children.map((child) => (
-											<SubTicketCard
-												key={child.id}
-												ticket={child}
-												blockedByNames={getBlockedByNames(child.id)}
-												onDelete={onDelete}
-											/>
-										))}
+										{expandedTickets.has(ticket.id) &&
+											children.map((child) => (
+												<SubTicketCard
+													key={child.id}
+													ticket={child}
+													blockedByNames={getBlockedByNames(child.id)}
+													onDelete={onDelete}
+												/>
+											))}
 									</div>
 								);
 							})}
