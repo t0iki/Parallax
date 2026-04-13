@@ -26,6 +26,7 @@ export function tmuxSendKeys(sessionName: string, text: string): void {
 		fs.writeFileSync(tmpFile, text);
 		execSync(`tmux load-buffer "${tmpFile}"`);
 		execSync(`tmux paste-buffer -t "${sessionName}"`);
+		execSync("sleep 0.5");
 		execSync(`tmux send-keys -t "${sessionName}" Enter`);
 		fs.unlinkSync(tmpFile);
 	} else {
