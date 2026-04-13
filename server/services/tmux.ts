@@ -1,4 +1,7 @@
 import { execSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 export function tmuxSessionExists(sessionName: string): boolean {
 	try {
@@ -18,11 +21,7 @@ export function tmuxKillSession(sessionName: string): void {
 }
 
 export function tmuxSendKeys(sessionName: string, text: string): void {
-	// 長いテキストはファイル経由で送る（tmux send-keysの文字数制限回避）
 	if (text.length > 200) {
-		const fs = require("node:fs");
-		const os = require("node:os");
-		const path = require("node:path");
 		const tmpFile = path.join(os.tmpdir(), `plx-sendkeys-${Date.now()}.txt`);
 		fs.writeFileSync(tmpFile, text);
 		execSync(`tmux load-buffer "${tmpFile}"`);
