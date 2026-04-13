@@ -40,6 +40,7 @@ export function StartTicketDialog({
 	return (
 		/* biome-ignore lint/a11y/noStaticElementInteractions: modal overlay */
 		<div
+			data-modal
 			style={{
 				position: "fixed",
 				inset: 0,

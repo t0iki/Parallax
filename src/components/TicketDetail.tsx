@@ -136,10 +136,13 @@ export function TicketDetail({
 
 	const hasDiff = !!ticket.baseCommit;
 
-	// パネル外クリックで閉じる
+	// パネル外クリックで閉じる（モーダルが開いている場合は無視）
 	useEffect(() => {
 		const handleClick = (e: MouseEvent) => {
 			if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+				// z-index 100以上の要素（モーダル等）をクリックした場合は閉じない
+				const target = e.target as HTMLElement;
+				if (target.closest("[data-modal]")) return;
 				onClose();
 			}
 		};
