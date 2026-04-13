@@ -395,6 +395,7 @@ export function TodoApp() {
 					onCreatePR={createPR}
 					onApply={applyChanges}
 					onRevert={revertChanges}
+					onStart={handleStart}
 				/>
 			)}
 

@@ -17,6 +17,7 @@ type Props = {
 	onCreatePR: (ticketId: string) => void;
 	onApply: (ticketId: string) => void;
 	onRevert: (ticketId: string) => void;
+	onStart: (ticketId: string) => void;
 };
 
 function Overview({
@@ -123,6 +124,7 @@ export function TicketDetail({
 	onCreatePR,
 	onApply,
 	onRevert,
+	onStart,
 }: Props) {
 	const { theme } = useTheme();
 	const [tab, setTab] = useState<DetailTab>("overview");
@@ -335,7 +337,7 @@ export function TicketDetail({
 					>
 						概要
 					</button>
-					{session && (
+					{session ? (
 						<button
 							type="button"
 							onClick={() => setTab("terminal")}
@@ -343,6 +345,23 @@ export function TicketDetail({
 						>
 							Terminal
 						</button>
+					) : (
+						ticket.status === "in_progress" && (
+							<button
+								type="button"
+								onClick={() => onStart(ticket.id)}
+								style={{
+									padding: "6px 14px",
+									fontSize: 12,
+									border: "none",
+									backgroundColor: "transparent",
+									color: theme.green,
+									cursor: "pointer",
+								}}
+							>
+								▶ 起動
+							</button>
+						)
 					)}
 					{hasDiff && (
 						<button

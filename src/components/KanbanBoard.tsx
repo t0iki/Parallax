@@ -266,24 +266,26 @@ function TicketCard({
 						flexShrink: 0,
 					}}
 				>
-					<button
-						type="button"
-						onClick={(e) => {
-							e.stopPropagation();
-							onStart(ticket.id);
-						}}
-						style={{
-							padding: "2px 6px",
-							fontSize: 11,
-							backgroundColor: "transparent",
-							color: theme.green,
-							border: `1px solid ${theme.greenBorder}`,
-							borderRadius: 4,
-							cursor: "pointer",
-						}}
-					>
-						▶
-					</button>
+					{ticket.status === "todo" && (
+						<button
+							type="button"
+							onClick={(e) => {
+								e.stopPropagation();
+								onStart(ticket.id);
+							}}
+							style={{
+								padding: "2px 6px",
+								fontSize: 11,
+								backgroundColor: "transparent",
+								color: theme.green,
+								border: `1px solid ${theme.greenBorder}`,
+								borderRadius: 4,
+								cursor: "pointer",
+							}}
+						>
+							▶
+						</button>
+					)}
 					{ticket.sourceUrl && (
 						<a
 							href={ticket.sourceUrl}
