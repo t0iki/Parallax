@@ -195,11 +195,17 @@ function Overview({
 	const descChanged = description !== ticket.description;
 	const dirty = titleChanged || descChanged;
 
+	const [saved, setSaved] = useState(false);
+
 	const save = () => {
 		const fields: { title?: string; description?: string } = {};
 		if (titleChanged) fields.title = title;
 		if (descChanged) fields.description = description;
-		if (dirty) onUpdate(ticket.id, fields);
+		if (dirty) {
+			onUpdate(ticket.id, fields);
+			setSaved(true);
+			setTimeout(() => setSaved(false), 2000);
+		}
 	};
 
 	return (
@@ -221,7 +227,6 @@ function Overview({
 					type="text"
 					value={title}
 					onChange={(e) => setTitle(e.target.value)}
-					onBlur={save}
 					style={{
 						padding: "8px 10px",
 						fontSize: 14,
@@ -244,7 +249,6 @@ function Overview({
 				<textarea
 					value={description}
 					onChange={(e) => setDescription(e.target.value)}
-					onBlur={save}
 					style={{
 						flex: 1,
 						minHeight: 120,
@@ -272,6 +276,24 @@ function Overview({
 					</a>
 				</div>
 			)}
+			<button
+				type="button"
+				onClick={save}
+				disabled={!dirty}
+				style={{
+					padding: "8px 20px",
+					fontSize: 13,
+					backgroundColor: dirty ? theme.accent : theme.border,
+					color: dirty ? "#fff" : theme.textDim,
+					border: "none",
+					borderRadius: 4,
+					cursor: dirty ? "pointer" : "default",
+					alignSelf: "flex-start",
+					transition: "background-color 0.15s",
+				}}
+			>
+				{saved ? "保存しました" : "保存"}
+			</button>
 		</div>
 	);
 }
