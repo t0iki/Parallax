@@ -156,11 +156,12 @@ export function TodoApp() {
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
 				text: `以下のworktreeの変更をメインディレクトリに反映してください。
-1. worktree "${ticket.worktreePath}" に移動して、base_commit "${ticket.baseCommit}" からの差分をpatchファイルとして生成してください。worktreeはリポジトリのサブディレクトリにあるため、必ず --relative オプションを使ってください:
-   cd "${ticket.worktreePath}" && git diff --relative ${ticket.baseCommit} > /tmp/plx-patch-${ticketId}.patch
-2. メインディレクトリ "${dir.path}" でそのpatchを適用:
-   cd "${dir.path}" && git apply /tmp/plx-patch-${ticketId}.patch
-3. 適用したファイル一覧を表示してください`,
+1. worktree "${ticket.worktreePath}" でbase_commit "${ticket.baseCommit}" からの差分をpatchファイルとして生成:
+   cd "${ticket.worktreePath}" && git diff ${ticket.baseCommit} > /tmp/plx-patch-${ticketId}.patch
+2. メインディレクトリ "${dir.path}" のリポジトリルートを特定し、そこからpatchを適用:
+   REPO_ROOT=$(cd "${dir.path}" && git rev-parse --show-toplevel) && cd "$REPO_ROOT" && git apply --3way /tmp/plx-patch-${ticketId}.patch
+3. コンフリクトがあれば解消してください
+4. 適用したファイル一覧を表示してください`,
 			}),
 		});
 	};
@@ -175,8 +176,10 @@ export function TodoApp() {
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
 				text: `メインディレクトリ "${dir.path}" に先ほど反映したチケット "${ticket.title}" の変更を元に戻してください。
-1. patchファイル /tmp/plx-patch-${ticketId}.patch が残っていればそれを使って git apply --reverse で戻す
-2. patchファイルがなければ git checkout -- . で変更を戻す（ただし他の変更も戻る旨を警告してください）
+1. patchファイル /tmp/plx-patch-${ticketId}.patch が残っていればそれを使ってリポジトリルートから元に戻す:
+   REPO_ROOT=$(cd "${dir.path}" && git rev-parse --show-toplevel) && cd "$REPO_ROOT" && git apply --reverse /tmp/plx-patch-${ticketId}.patch
+   もし --reverse が失敗したら、git restore --staged --worktree で該当ファイルをHEADに戻す
+2. patchファイルがなければ git restore --staged --worktree で変更を戻す（ただし他の変更も戻る旨を警告してください）
 3. 戻したファイル一覧を表示してください`,
 			}),
 		});
