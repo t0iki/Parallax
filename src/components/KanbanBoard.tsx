@@ -550,6 +550,7 @@ export function KanbanBoard({
 	const columnColors = {
 		todo: theme.columnTodo,
 		in_progress: theme.columnInProgress,
+		done: theme.columnDone,
 	};
 	const dirMap = new Map(directories.map((d) => [d.id, d.name]));
 	const [expandedTickets, setExpandedTickets] = useState<Set<string>>(

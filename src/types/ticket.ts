@@ -1,9 +1,10 @@
-export const STATUSES = ["todo", "in_progress"] as const;
+export const STATUSES = ["todo", "in_progress", "done"] as const;
 export type Status = (typeof STATUSES)[number];
 
 export const STATUS_LABELS: Record<Status, string> = {
 	todo: "TODO",
 	in_progress: "作業中",
+	done: "完了",
 };
 
 export type Ticket = {

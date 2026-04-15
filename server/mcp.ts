@@ -25,7 +25,7 @@ server.tool(
 		title: z.string().describe("チケットのタイトル"),
 		description: z.string().default("").describe("チケットの詳細説明"),
 		status: z
-			.enum(["todo", "in_progress"])
+			.enum(["todo", "in_progress", "done"])
 			.default("todo")
 			.describe("ステータス (todo, in_progress, done)"),
 		parentId: z
@@ -62,7 +62,7 @@ server.tool(
 	{
 		id: z.string().describe("チケットのID"),
 		status: z
-			.enum(["todo", "in_progress"])
+			.enum(["todo", "in_progress", "done"])
 			.optional()
 			.describe("新しいステータス"),
 		title: z.string().optional().describe("新しいタイトル"),
@@ -90,7 +90,9 @@ server.tool(
 	"チケットのステータスを変更する",
 	{
 		id: z.string().describe("チケットのID"),
-		status: z.enum(["todo", "in_progress"]).describe("新しいステータス"),
+		status: z
+			.enum(["todo", "in_progress", "done"])
+			.describe("新しいステータス"),
 	},
 	async ({ id, status }) => {
 		const res = await fetch(`${API_BASE}/tickets/${id}`, {
@@ -155,7 +157,7 @@ server.tool(
 	{
 		url: z.string().describe("GitHub IssueのURL"),
 		status: z
-			.enum(["todo", "in_progress"])
+			.enum(["todo", "in_progress", "done"])
 			.default("todo")
 			.describe("ステータス"),
 		parentId: z.string().optional().describe("親チケットのID"),

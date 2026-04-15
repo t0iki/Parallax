@@ -23,6 +23,7 @@ export type Theme = {
 	shadow: string;
 	columnTodo: { bg: string; border: string; badge: string };
 	columnInProgress: { bg: string; border: string; badge: string };
+	columnDone: { bg: string; border: string; badge: string };
 };
 
 export const darkTheme: Theme = {
@@ -50,6 +51,7 @@ export const darkTheme: Theme = {
 	shadow: "rgba(0,0,0,0.5)",
 	columnTodo: { bg: "#1c1c28", border: "#2a2a35", badge: "#6c757d" },
 	columnInProgress: { bg: "#1f1c14", border: "#3d3520", badge: "#c68a1a" },
+	columnDone: { bg: "#141f16", border: "#1e3524", badge: "#2e7d32" },
 };
 
 export const lightTheme: Theme = {
@@ -77,4 +79,5 @@ export const lightTheme: Theme = {
 	shadow: "rgba(0,0,0,0.12)",
 	columnTodo: { bg: "#f8f8fa", border: "#d0d0d5", badge: "#78909c" },
 	columnInProgress: { bg: "#fff8e1", border: "#ffe082", badge: "#f9a825" },
+	columnDone: { bg: "#e8f5e9", border: "#a5d6a7", badge: "#43a047" },
 };
