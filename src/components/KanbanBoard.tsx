@@ -127,8 +127,26 @@ function TicketMenu({
 						onClick={(e) => {
 							e.stopPropagation();
 							onToggleMenu("");
-							const p = `/tmp/plx/plx-ticket-${ticketId}.md`;
-							navigator.clipboard.writeText(p);
+							navigator.clipboard.writeText(ticketId);
+						}}
+						style={{ ...menuItemStyle, color: theme.textLabel }}
+						onMouseEnter={(e) => {
+							(e.target as HTMLElement).style.backgroundColor = theme.bgHover;
+						}}
+						onMouseLeave={(e) => {
+							(e.target as HTMLElement).style.backgroundColor = "transparent";
+						}}
+					>
+						IDをコピー
+					</button>
+					<button
+						type="button"
+						onClick={(e) => {
+							e.stopPropagation();
+							onToggleMenu("");
+							navigator.clipboard.writeText(
+								`/tmp/plx/plx-ticket-${ticketId}.md`,
+							);
 						}}
 						style={{ ...menuItemStyle, color: theme.textLabel }}
 						onMouseEnter={(e) => {

@@ -103,6 +103,22 @@ function DetailMenu({
 					<button
 						type="button"
 						onClick={() => {
+							navigator.clipboard.writeText(ticketId);
+							setOpen(false);
+						}}
+						style={itemStyle}
+						onMouseEnter={(e) => {
+							(e.target as HTMLElement).style.backgroundColor = theme.bgHover;
+						}}
+						onMouseLeave={(e) => {
+							(e.target as HTMLElement).style.backgroundColor = "transparent";
+						}}
+					>
+						IDをコピー
+					</button>
+					<button
+						type="button"
+						onClick={() => {
 							navigator.clipboard.writeText(
 								`/tmp/plx/plx-ticket-${ticketId}.md`,
 							);
