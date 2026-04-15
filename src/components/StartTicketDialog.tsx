@@ -10,6 +10,7 @@ type Props = {
 		ticketId: string,
 		directoryId: string,
 		addDirectoryIds: string[],
+		useWorktree: boolean,
 	) => void;
 	onCancel: () => void;
 };
@@ -26,6 +27,7 @@ export function StartTicketDialog({
 		directories[0]?.id ?? HOME_ID,
 	);
 	const [addDirIds, setAddDirIds] = useState<string[]>([]);
+	const [useWorktree, setUseWorktree] = useState(true);
 
 	const toggleAddDir = (id: string) => {
 		setAddDirIds((prev) =>
@@ -164,6 +166,27 @@ export function StartTicketDialog({
 					</div>
 				)}
 
+				{selectedDirId !== HOME_ID && (
+					<label
+						style={{
+							display: "flex",
+							alignItems: "center",
+							gap: 8,
+							fontSize: 13,
+							color: theme.textLabel,
+							marginBottom: 12,
+							cursor: "pointer",
+						}}
+					>
+						<input
+							type="checkbox"
+							checked={useWorktree}
+							onChange={(e) => setUseWorktree(e.target.checked)}
+						/>
+						Git Worktreeで環境を分離する
+					</label>
+				)}
+
 				<div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
 					<button
 						type="button"
@@ -183,7 +206,13 @@ export function StartTicketDialog({
 					<button
 						type="button"
 						onClick={() =>
-							selectedDirId && onConfirm(ticket.id, selectedDirId, addDirIds)
+							selectedDirId &&
+							onConfirm(
+								ticket.id,
+								selectedDirId,
+								addDirIds,
+								useWorktree && selectedDirId !== HOME_ID,
+							)
 						}
 						disabled={!selectedDirId}
 						style={{

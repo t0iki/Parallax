@@ -252,7 +252,7 @@ export function TodoApp() {
 
 		// 作業中で未セットアップ（手動移動）の場合はホームで直接起動
 		if (ticket.status === "in_progress" && !ticket.workDirectoryId) {
-			handleConfirmStart(ticketId, "__home__", []);
+			handleConfirmStart(ticketId, "__home__", [], false);
 			return;
 		}
 
@@ -263,13 +263,14 @@ export function TodoApp() {
 		ticketId: string,
 		directoryId: string,
 		addDirectoryIds: string[],
+		useWorktree = true,
 	) => {
 		setStartingTicket(null);
 
 		const res = await fetch(`/api/tickets/${ticketId}/start`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ directoryId, addDirectoryIds }),
+			body: JSON.stringify({ directoryId, addDirectoryIds, useWorktree }),
 		});
 		const { sessionName, cwd, addDirPaths } = await res.json();
 

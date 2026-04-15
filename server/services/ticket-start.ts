@@ -14,6 +14,7 @@ interface StartParams {
 	ticketId: string;
 	directoryId: string;
 	addDirectoryIds?: string[];
+	useWorktree?: boolean;
 }
 
 interface StartResult {
@@ -124,7 +125,7 @@ function updatePhase(ticketId: string, phase: string): void {
 }
 
 export function startTicket(params: StartParams): StartResult | null {
-	const { ticketId, directoryId, addDirectoryIds } = params;
+	const { ticketId, directoryId, addDirectoryIds, useWorktree = true } = params;
 
 	const ticket = db
 		.prepare("SELECT id, title, description FROM tickets WHERE id = ?")
@@ -171,7 +172,7 @@ export function startTicket(params: StartParams): StartResult | null {
 
 	if (isHome) {
 		effectiveCwd = os.homedir();
-	} else if (dir) {
+	} else if (dir && useWorktree) {
 		branchName = (dir.branch_template || "{title}")
 			.replace("{title}", slugify(ticket.title))
 			.replace("{id}", ticketId.slice(0, 8));
@@ -190,6 +191,9 @@ export function startTicket(params: StartParams): StartResult | null {
 			console.error("Failed to create worktree:", err);
 		}
 		effectiveCwd = worktreePath ?? dir.path;
+	} else if (dir) {
+		// worktreeなし: ディレクトリに直接移動
+		effectiveCwd = dir.path;
 	} else {
 		effectiveCwd = os.homedir();
 	}
