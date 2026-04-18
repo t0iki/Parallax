@@ -41,6 +41,17 @@ export function Terminal({
 			// tmux/Claude Code がマウスを掴んでいても Option+ドラッグで選択できる
 			macOptionClickForcesSelection: true,
 			rightClickSelectsWord: true,
+			// OSC 8 ハイパーリンク (Claudeの「PR #xxxx」等) のクリックハンドラ
+			linkHandler: {
+				activate: (event, uri) => {
+					if (event.metaKey || event.ctrlKey) {
+						window.open(uri, "_blank", "noopener,noreferrer");
+					}
+				},
+				hover: () => {},
+				leave: () => {},
+				allowNonHttpProtocols: false,
+			},
 			theme: {
 				background: "#1a1a2e",
 				foreground: "#e0e0e0",
