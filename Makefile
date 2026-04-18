@@ -9,6 +9,8 @@ setup:
 	@command -v tmux >/dev/null 2>&1 || { echo "Installing tmux..."; brew install tmux; }
 	@echo "Installing dependencies..."
 	@pnpm install
+	@echo "Rebuilding native modules (node-pty) for current Node version..."
+	@pnpm rebuild
 	@echo "Linking plx command..."
 	@pnpm link --global
 	@echo "Setup complete. Run 'plx' to start."

@@ -6,9 +6,19 @@ import { WebSocketServer } from "ws";
 import { handleDirectories } from "./routes/directories.js";
 import { handleSessions } from "./routes/sessions.js";
 import { handleTickets } from "./routes/tickets.js";
+import { ensurePath, findBinary } from "./services/env.js";
 import { tmuxSessionExists } from "./services/tmux.js";
 
+ensurePath();
+
 fs.mkdirSync("/tmp/plx", { recursive: true });
+
+const TMUX_BIN = findBinary("tmux");
+if (!TMUX_BIN) {
+	console.warn(
+		"tmux not found in PATH or common locations. Run `make setup` or `brew install tmux`.",
+	);
+}
 
 const PORT = 24510;
 const SESSION_NAME = "plx-main";
@@ -43,8 +53,12 @@ const server = http.createServer(async (req, res) => {
 		const { readBody, json: jsonRes } = await import("./utils.js");
 		const { execSync } = await import("node:child_process");
 		const body = JSON.parse(await readBody(req));
+		const cursorBin =
+			findBinary("cursor", [
+				"/Applications/Cursor.app/Contents/Resources/app/bin",
+			]) ?? "cursor";
 		try {
-			execSync(`cursor "${body.path}"`);
+			execSync(`"${cursorBin}" "${body.path}"`);
 			jsonRes(res, 200, { ok: true });
 		} catch (err) {
 			jsonRes(res, 500, {
@@ -76,9 +90,18 @@ server.on("upgrade", (req, socket, head) => {
 wss.on("connection", (ws, req: http.IncomingMessage) => {
 	const reqUrl = new URL(req.url ?? "/", `http://localhost:${PORT}`);
 	const sessionName = reqUrl.searchParams.get("session") ?? SESSION_NAME;
-	const cwd = reqUrl.searchParams.get("cwd") ?? PROJECT_DIR;
+	const requestedCwd = reqUrl.searchParams.get("cwd") ?? PROJECT_DIR;
+	const cwd =
+		fs.existsSync(requestedCwd) && fs.statSync(requestedCwd).isDirectory()
+			? requestedCwd
+			: PROJECT_DIR;
+	if (cwd !== requestedCwd) {
+		console.warn(
+			`cwd "${requestedCwd}" does not exist, falling back to ${PROJECT_DIR}`,
+		);
+	}
 
-	console.log(`Client connected: session=${sessionName}`);
+	console.log(`Client connected: session=${sessionName}, cwd=${cwd}`);
 
 	const env: Record<string, string> = {
 		...Object.fromEntries(
@@ -102,13 +125,17 @@ wss.on("connection", (ws, req: http.IncomingMessage) => {
 	};
 
 	try {
-		ptyProcess = pty.spawn("tmux", ["new-session", "-A", "-s", sessionName], {
-			name: "xterm-256color",
-			cols: 80,
-			rows: 24,
-			cwd,
-			env,
-		});
+		ptyProcess = pty.spawn(
+			TMUX_BIN ?? "tmux",
+			["new-session", "-A", "-s", sessionName],
+			{
+				name: "xterm-256color",
+				cols: 80,
+				rows: 24,
+				cwd,
+				env,
+			},
+		);
 
 		// Main session only: auto-launch Claude Code via launcher
 		if (isNew && !sessionName.startsWith("plx-ticket-")) {
