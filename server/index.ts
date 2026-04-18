@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
@@ -12,6 +13,10 @@ import { tmuxSessionExists } from "./services/tmux.js";
 
 ensurePath();
 
+// Claude Code 等に OSC 8 ハイパーリンクを出力させる
+process.env.FORCE_HYPERLINK = process.env.FORCE_HYPERLINK ?? "1";
+process.env.COLORTERM = process.env.COLORTERM ?? "truecolor";
+
 fs.mkdirSync("/tmp/plx", { recursive: true });
 
 const TMUX_BIN = findBinary("tmux");
@@ -19,6 +24,17 @@ if (!TMUX_BIN) {
 	console.warn(
 		"tmux not found in PATH or common locations. Run `make setup` or `brew install tmux`.",
 	);
+} else {
+	// OSC 8 ハイパーリンクを tmux で素通しさせる (tmux 3.4+)
+	try {
+		execSync(`"${TMUX_BIN}" start-server`, { stdio: "ignore" });
+		execSync(
+			`"${TMUX_BIN}" set-option -g terminal-features "*:hyperlinks"`,
+			{ stdio: "ignore" },
+		);
+	} catch (err) {
+		console.warn("Failed to enable tmux hyperlink passthrough:", err);
+	}
 }
 
 const PORT = 24510;
@@ -73,7 +89,6 @@ const server = http.createServer(async (req, res) => {
 	// POST /api/open-in-cursor
 	if (req.method === "POST" && url.pathname === "/api/open-in-cursor") {
 		const { readBody, json: jsonRes } = await import("./utils.js");
-		const { execSync } = await import("node:child_process");
 		const body = JSON.parse(await readBody(req));
 		const cursorBin =
 			findBinary("cursor", [
