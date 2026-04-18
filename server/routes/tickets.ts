@@ -226,6 +226,7 @@ export async function handleTickets(
 			directoryId: body.directoryId,
 			addDirectoryIds: body.addDirectoryIds,
 			useWorktree: body.useWorktree ?? true,
+			baseBranch: body.baseBranch,
 		});
 		if (!result) {
 			json(res, 404, { error: "Ticket or directory not found" });

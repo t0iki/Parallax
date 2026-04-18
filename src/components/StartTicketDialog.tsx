@@ -11,6 +11,7 @@ type Props = {
 		directoryId: string,
 		addDirectoryIds: string[],
 		useWorktree: boolean,
+		baseBranch?: string,
 	) => void;
 	onCancel: () => void;
 };
@@ -28,6 +29,10 @@ export function StartTicketDialog({
 	);
 	const [addDirIds, setAddDirIds] = useState<string[]>([]);
 	const [useWorktree, setUseWorktree] = useState(true);
+	const [baseBranch, setBaseBranch] = useState("");
+
+	const selectedDir = directories.find((d) => d.id === selectedDirId);
+	const mainBranchPlaceholder = selectedDir?.mainBranch ?? "main";
 
 	const toggleAddDir = (id: string) => {
 		setAddDirIds((prev) =>
@@ -187,6 +192,39 @@ export function StartTicketDialog({
 					</label>
 				)}
 
+				{selectedDirId !== HOME_ID && useWorktree && (
+					<div style={{ marginBottom: 16 }}>
+						<label
+							style={{
+								display: "block",
+								fontSize: 13,
+								color: theme.textLabel,
+								marginBottom: 6,
+							}}
+						>
+							ベースブランチ (未入力なら {mainBranchPlaceholder})
+							<input
+								type="text"
+								value={baseBranch}
+								onChange={(e) => setBaseBranch(e.target.value)}
+								placeholder={mainBranchPlaceholder}
+								style={{
+									display: "block",
+									width: "100%",
+									marginTop: 4,
+									padding: "6px 8px",
+									fontSize: 13,
+									backgroundColor: theme.bgInput,
+									color: theme.text,
+									border: `1px solid ${theme.border}`,
+									borderRadius: 4,
+									fontFamily: "monospace",
+								}}
+							/>
+						</label>
+					</div>
+				)}
+
 				<div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
 					<button
 						type="button"
@@ -212,6 +250,7 @@ export function StartTicketDialog({
 								selectedDirId,
 								addDirIds,
 								useWorktree && selectedDirId !== HOME_ID,
+								baseBranch.trim() || undefined,
 							)
 						}
 						disabled={!selectedDirId}

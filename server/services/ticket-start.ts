@@ -15,6 +15,7 @@ interface StartParams {
 	directoryId: string;
 	addDirectoryIds?: string[];
 	useWorktree?: boolean;
+	baseBranch?: string;
 }
 
 interface StartResult {
@@ -125,7 +126,13 @@ function updatePhase(ticketId: string, phase: string): void {
 }
 
 export function startTicket(params: StartParams): StartResult | null {
-	const { ticketId, directoryId, addDirectoryIds, useWorktree = true } = params;
+	const {
+		ticketId,
+		directoryId,
+		addDirectoryIds,
+		useWorktree = true,
+		baseBranch,
+	} = params;
 
 	const ticket = db
 		.prepare("SELECT id, title, description FROM tickets WHERE id = ?")
@@ -177,14 +184,15 @@ export function startTicket(params: StartParams): StartResult | null {
 			.replace("{title}", slugify(ticket.title))
 			.replace("{id}", ticketId.slice(0, 8));
 		const worktreeDir = path.join(dir.path, ".plx-worktrees", ticketId);
-		baseCommit = getHeadCommit(dir.path, dir.main_branch);
+		const effectiveBase = baseBranch?.trim() || dir.main_branch;
+		baseCommit = getHeadCommit(dir.path, effectiveBase);
 
 		try {
 			createWorktree({
 				repoPath: dir.path,
 				worktreeDir,
 				branchName,
-				baseBranch: dir.main_branch,
+				baseBranch: effectiveBase,
 			});
 			worktreePath = worktreeDir;
 		} catch (err) {

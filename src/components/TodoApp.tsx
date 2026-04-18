@@ -264,13 +264,19 @@ export function TodoApp() {
 		directoryId: string,
 		addDirectoryIds: string[],
 		useWorktree = true,
+		baseBranch?: string,
 	) => {
 		setStartingTicket(null);
 
 		const res = await fetch(`/api/tickets/${ticketId}/start`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ directoryId, addDirectoryIds, useWorktree }),
+			body: JSON.stringify({
+				directoryId,
+				addDirectoryIds,
+				useWorktree,
+				baseBranch,
+			}),
 		});
 		const { sessionName, cwd, addDirPaths } = await res.json();
 
