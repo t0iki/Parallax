@@ -37,6 +37,9 @@ export function Terminal({
 			fontSize: 13,
 			fontFamily: '"Menlo", "DejaVu Sans Mono", "Consolas", monospace',
 			allowProposedApi: true,
+			// tmux/Claude Code がマウスを掴んでいても Option+ドラッグで選択できる
+			macOptionClickForcesSelection: true,
+			rightClickSelectsWord: true,
 			theme: {
 				background: "#1a1a2e",
 				foreground: "#e0e0e0",
@@ -123,6 +126,16 @@ export function Terminal({
 				/>
 				<span style={{ fontWeight: 600, fontSize: 14, color: theme.textLabel }}>
 					{label}
+				</span>
+				<span
+					style={{
+						fontSize: 11,
+						color: theme.textLabel,
+						opacity: 0.6,
+						marginLeft: 4,
+					}}
+				>
+					Option+ドラッグで選択 / Shift+ドラッグも可
 				</span>
 			</div>
 			<div
