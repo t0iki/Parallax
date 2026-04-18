@@ -1,4 +1,5 @@
 import { FitAddon } from "@xterm/addon-fit";
+import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Terminal as XTerm } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 import { useEffect, useRef } from "react";
@@ -50,6 +51,14 @@ export function Terminal({
 
 		const fitAddon = new FitAddon();
 		term.loadAddon(fitAddon);
+		// Cmd/Ctrl+クリックでリンクを開く (tmux/Claudeのマウス捕獲下でも動作)
+		term.loadAddon(
+			new WebLinksAddon((event, uri) => {
+				if (event.metaKey || event.ctrlKey) {
+					window.open(uri, "_blank", "noopener,noreferrer");
+				}
+			}),
+		);
 		term.open(container);
 		fitAddon.fit();
 
@@ -135,7 +144,7 @@ export function Terminal({
 						marginLeft: 4,
 					}}
 				>
-					Option+ドラッグで選択 / Shift+ドラッグも可
+					Option+ドラッグで選択 / ⌘+クリックでリンクを開く
 				</span>
 			</div>
 			<div
