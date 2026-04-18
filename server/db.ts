@@ -1,7 +1,10 @@
+import fs from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
 const DB_PATH = path.join(import.meta.dirname, "..", "data", "parallax.db");
+
+fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
 const db = new DatabaseSync(DB_PATH);
 
