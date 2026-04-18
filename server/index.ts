@@ -7,6 +7,7 @@ import { handleDirectories } from "./routes/directories.js";
 import { handleSessions } from "./routes/sessions.js";
 import { handleTickets } from "./routes/tickets.js";
 import { ensurePath, findBinary } from "./services/env.js";
+import { subscribeNotifications } from "./services/notifications.js";
 import { tmuxSessionExists } from "./services/tmux.js";
 
 ensurePath();
@@ -47,6 +48,27 @@ const server = http.createServer(async (req, res) => {
 	if (await handleTickets(req, res, url)) return;
 	if (await handleDirectories(req, res, url)) return;
 	if (await handleSessions(req, res, url, PROJECT_DIR)) return;
+
+	// GET /api/events — Server-Sent Events for notifications
+	if (req.method === "GET" && url.pathname === "/api/events") {
+		res.writeHead(200, {
+			"Content-Type": "text/event-stream",
+			"Cache-Control": "no-cache",
+			Connection: "keep-alive",
+		});
+		res.write("retry: 5000\n\n");
+		const unsubscribe = subscribeNotifications((event) => {
+			res.write(`data: ${JSON.stringify(event)}\n\n`);
+		});
+		const keepAlive = setInterval(() => {
+			res.write(": keep-alive\n\n");
+		}, 25_000);
+		req.on("close", () => {
+			clearInterval(keepAlive);
+			unsubscribe();
+		});
+		return;
+	}
 
 	// POST /api/open-in-cursor
 	if (req.method === "POST" && url.pathname === "/api/open-in-cursor") {

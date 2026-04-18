@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import { Settings } from "./components/Settings";
 import { Terminal } from "./components/Terminal";
 import { TodoApp } from "./components/TodoApp";
+import { useBrowserNotifications } from "./lib/useBrowserNotifications";
 import { useTheme } from "./lib/ThemeContext";
 
 type Page = "todo" | "settings";
@@ -12,6 +13,8 @@ export function App() {
 	const [leftWidthPercent, setLeftWidthPercent] = useState(33);
 	const dragging = useRef(false);
 	const [page, setPage] = useState<Page>("todo");
+
+	useBrowserNotifications();
 
 	const handleMouseDown = useCallback((e: React.MouseEvent) => {
 		e.preventDefault();
